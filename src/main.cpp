@@ -125,7 +125,7 @@ void handleInput(const std::string& input) {
     }
 
     // Construct the command string
-    std::string full_command = command_path.string();
+    std::string full_command = command_path.filename().string();
     for (const auto& arg : args) {
         full_command += " " + arg;
     }
