@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <map>
 #include <functional>
+#include <filesystem>
 
 // Create a map to associate commands with their corresponding functions
 std::map<std::string, std::function<void(const std::vector<std::string>&)>> shellBuiltins;
@@ -27,6 +28,37 @@ std::vector<std::string> sliceVector(const std::vector<std::string>& vec, const 
         return {};
     }
     return {vec.begin() + static_cast<long>(startIndex), vec.end()};
+}
+
+std::vector<std::string> getPathsFromEnv() {
+    std::vector<std::string> paths;
+
+    // Get the value of the PATH environment variable
+
+    if (const char* path = std::getenv("PATH")) {
+        const std::string path_str(path);
+
+        // Determine the delimiter based on the platform
+        const char delimiter = (std::filesystem::is_directory("/")) ? ':' : ';';
+
+        // Split the PATH string based on the delimiter
+        std::stringstream ss(path_str);
+        std::string item;
+        while (std::getline(ss, item, delimiter)) {
+            paths.push_back(item);
+        }
+    } else {
+        std::cout << "PATH environment variable not found or is empty.";
+    }
+
+    return paths;
+}
+
+bool isExecutable(const std::filesystem::path& path) {
+    // Check if the file exists and is a regular file
+    return exists(path) &&
+           is_regular_file(path) &&
+           (status(path).permissions() & std::filesystem::perms::owner_exec) != std::filesystem::perms::none;
 }
 
 void commandNotFound(const std::string& command) {
@@ -57,10 +89,28 @@ void typeCommand(const std::vector<std::string>& args) {
         return;
     }
 
-    if (const auto it = shellBuiltins.find(args[0]); it != shellBuiltins.end()) {
+    const std::string& command = args[0];
+
+    if (const auto it = shellBuiltins.find(command); it != shellBuiltins.end()) {
         std::cout << it->first + " is a shell builtin";
-    } else {
-        std::cerr << args[0] + ": not found";
+    }
+
+    std::vector<std::string> paths = getPathsFromEnv();
+    if (paths.empty()) {
+        return;
+    }
+
+    bool found = false;
+    for (const auto& dir : paths) {
+        if (std::filesystem::path command_path = std::filesystem::path(dir) / command; isExecutable(command_path)) {
+            std::cout << command + " is " + command_path.string();
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        std::cerr << command + ": not found";
     }
 }
 
@@ -90,7 +140,8 @@ void typeCommand(const std::vector<std::string>& args) {
 
         if (const auto it = shellBuiltins.find(command); it != shellBuiltins.end()) {
             it->second(args);
-        } else {
+        }
+        else {
             commandNotFound(command);
         }
         std::cout << std::endl;
