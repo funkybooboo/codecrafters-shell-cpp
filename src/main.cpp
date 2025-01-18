@@ -124,20 +124,15 @@ void handleInput(const std::string& input) {
         return;
     }
 
-    // Construct the command string
     std::string full_command = command_path.filename().string();
     for (const auto& arg : args) {
         full_command += " " + arg;
     }
 
-    // Execute the command with arguments
-    if (const int result = std::system(full_command.c_str()); result != 0) {
-        std::cerr << "Error executing the command";
-    }
+    std::system(full_command.c_str());
 }
 
 [[noreturn]] int main() {
-    // Flush after every std::cout / std:cerr
     std::cout << std::unitbuf;
     std::cerr << std::unitbuf;
 
