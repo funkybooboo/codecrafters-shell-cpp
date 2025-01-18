@@ -117,8 +117,21 @@ void cdCommand(const std::vector<std::string>& args) {
     if (args.empty()) {
         return;
     }
-    if (const char *newDir = args[0].c_str(); chdir(newDir) != 0) {
-        std::cerr << "cd: " + args[0] + ": No such file or directory" << std::endl;
+
+    std::filesystem::path newDir = args[0];
+
+    if (!newDir.is_absolute()) {
+        const std::filesystem::path currentDir = std::filesystem::current_path();
+        newDir = currentDir / newDir;
+    }
+
+    if (!exists(newDir)) {
+        std::cerr << "cd: " + newDir.string() + ": No such file or directory" << std::endl;
+        return;
+    }
+
+    if (chdir(newDir.c_str()) != 0) {
+        std::cerr << "cd: " + newDir.string() + ": No such file or directory" << std::endl;
     }
 }
 
