@@ -6,6 +6,7 @@
 #include <map>
 #include <functional>
 #include <filesystem>
+#include <unistd.h>
 
 std::map<std::string, std::function<void(const std::vector<std::string>&)>> shellBuiltins;
 
@@ -112,7 +113,16 @@ void pwdCommand(const std::vector<std::string>& args) {
     std::cout << current_path.string() << std::endl;
 }
 
-void handleInput(const std::string& input) {
+void cdCommand(const std::vector<std::string>& args) {
+    if (args.empty()) {
+        return;
+    }
+    if (const char *newDir = args[0].c_str(); chdir(newDir) != 0) {
+        std::cerr << "cd: " + args[0] + ": No such file or directory" << std::endl;
+    }
+}
+
+void handle(const std::string& input) {
     const std::vector<std::string> parts = splitString(input, ' ');
 
     const std::string& command = parts[0];
@@ -145,6 +155,7 @@ void handleInput(const std::string& input) {
     shellBuiltins["echo"] = echoCommand;
     shellBuiltins["type"] = typeCommand;
     shellBuiltins["pwd"] = pwdCommand;
+    shellBuiltins["cd"] = cdCommand;
 
     while (true) {
         std::cout << "$ ";
@@ -156,6 +167,6 @@ void handleInput(const std::string& input) {
             continue;
         }
 
-        handleInput(input);
+        handle(input);
     }
 }
