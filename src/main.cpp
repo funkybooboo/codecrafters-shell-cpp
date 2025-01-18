@@ -157,6 +157,10 @@ void cdCommand(const std::vector<std::string>& args) {
 }
 
 void handle(const std::string& input) {
+    if (input.empty()) {
+        return;
+    }
+
     const std::vector<std::string> parts = splitString(input, ' ');
 
     const std::string& command = parts[0];
@@ -196,10 +200,6 @@ void handle(const std::string& input) {
 
         std::string input;
         std::getline(std::cin, input);
-
-        if (input.empty()) {
-            continue;
-        }
 
         handle(input);
     }
