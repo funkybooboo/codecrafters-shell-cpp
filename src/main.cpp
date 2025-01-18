@@ -107,6 +107,11 @@ void typeCommand(const std::vector<std::string>& args) {
     std::cout << command + " is " + command_path.string() << std::endl;
 }
 
+void pwdCommand(const std::vector<std::string>& args) {
+    const std::filesystem::path current_path = std::filesystem::current_path();
+    std::cout << current_path << std::endl;
+}
+
 void handleInput(const std::string& input) {
     const std::vector<std::string> parts = splitString(input, ' ');
 
@@ -139,6 +144,7 @@ void handleInput(const std::string& input) {
     shellBuiltins["exit"] = exitCommand;
     shellBuiltins["echo"] = echoCommand;
     shellBuiltins["type"] = typeCommand;
+    shellBuiltins["pwd"] = pwdCommand;
 
     while (true) {
         std::cout << "$ ";
