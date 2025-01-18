@@ -6,6 +6,9 @@
 #include <map>
 #include <functional>
 
+// Create a map to associate commands with their corresponding functions
+std::map<std::string, std::function<void(const std::vector<std::string>&)>> shellBuiltins;
+
 std::vector<std::string> splitString(const std::string& str, const char delimiter) {
     std::vector<std::string> tokens;
     std::istringstream stream(str);
@@ -21,7 +24,7 @@ std::vector<std::string> splitString(const std::string& str, const char delimite
 
 std::vector<std::string> sliceVector(const std::vector<std::string>& vec, const size_t startIndex) {
     if (startIndex >= vec.size()) {
-        return {}; // Return an empty vector if the start index is out of bounds
+        return {};
     }
     return {vec.begin() + static_cast<long>(startIndex), vec.end()};
 }
@@ -48,17 +51,27 @@ void echoCommand(const std::vector<std::string>& args) {
     }
 }
 
+void typeCommand(const std::vector<std::string>& args) {
+    if (args.empty()) {
+        std::cerr << "type: not enough arguments";
+        return;
+    }
+
+    if (const auto it = shellBuiltins.find(args[0]); it != shellBuiltins.end()) {
+        std::cout << it->first + " is a shell builtin";
+    } else {
+        std::cerr << args[0] + ": not found";
+    }
+}
+
 [[noreturn]] int main() {
     // Flush after every std::cout / std:cerr
     std::cout << std::unitbuf;
     std::cerr << std::unitbuf;
 
-    // Create a map to associate commands with their corresponding functions
-    std::map<std::string, std::function<void(const std::vector<std::string>&)>> commandMap;
-
-    // Add commands to the map
-    commandMap["exit"] = exitCommand;
-    commandMap["echo"] = echoCommand;
+    shellBuiltins["exit"] = exitCommand;
+    shellBuiltins["echo"] = echoCommand;
+    shellBuiltins["type"] = typeCommand;
 
     while (true) {
         std::cout << "$ ";
@@ -75,12 +88,9 @@ void echoCommand(const std::vector<std::string>& args) {
         const std::string& command = parts[0];
         const std::vector<std::string> args = sliceVector(parts, 1);
 
-        // Check if the command exists in the map and invoke it
-        if (auto it = commandMap.find(command); it != commandMap.end()) {
-            // Command found, invoke the corresponding function
+        if (const auto it = shellBuiltins.find(command); it != shellBuiltins.end()) {
             it->second(args);
         } else {
-            // Command not found, invoke the default handler
             commandNotFound(command);
         }
         std::cout << std::endl;
