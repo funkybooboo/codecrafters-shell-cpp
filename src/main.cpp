@@ -109,7 +109,7 @@ void typeCommand(const std::vector<std::string>& args) {
 
 void pwdCommand(const std::vector<std::string>& args) {
     const std::filesystem::path current_path = std::filesystem::current_path();
-    std::cout << current_path << std::endl;
+    std::cout << current_path.string() << std::endl;
 }
 
 void handleInput(const std::string& input) {
