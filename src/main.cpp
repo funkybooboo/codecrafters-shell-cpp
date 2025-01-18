@@ -118,7 +118,28 @@ void cdCommand(const std::vector<std::string>& args) {
         return;
     }
 
-    std::filesystem::path newDir = args[0];
+    std::string newDirStr = args[0];
+
+    if (newDirStr == "~") {
+        if (const char* homeDir = std::getenv("HOME"); homeDir != nullptr) {
+            newDirStr = homeDir;
+        }
+        else {
+            std::cerr << "cd: $HOME not set" << std::endl;
+            return;
+        }
+    }
+    else if (newDirStr.starts_with("~/")) {
+        if (const char* homeDir = std::getenv("HOME"); homeDir != nullptr) {
+            newDirStr.replace(0, 1, homeDir);
+        }
+        else {
+            std::cerr << "cd: $HOME not set" << std::endl;
+            return;
+        }
+    }
+
+    std::filesystem::path newDir = newDirStr;
 
     if (!newDir.is_absolute()) {
         const std::filesystem::path currentDir = std::filesystem::current_path();
