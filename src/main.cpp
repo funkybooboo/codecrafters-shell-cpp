@@ -7,7 +7,6 @@
 #include <functional>
 #include <filesystem>
 
-// Create a map to associate commands with their corresponding functions
 std::map<std::string, std::function<void(const std::vector<std::string>&)>> shellBuiltins;
 
 std::vector<std::string> splitString(const std::string& str, const char delimiter) {
@@ -15,7 +14,6 @@ std::vector<std::string> splitString(const std::string& str, const char delimite
     std::istringstream stream(str);
     std::string token;
 
-    // Read each token separated by the delimiter (in this case, a space)
     while (std::getline(stream, token, delimiter)) {
         tokens.push_back(token);
     }
@@ -33,15 +31,11 @@ std::vector<std::string> sliceVector(const std::vector<std::string>& vec, const 
 std::vector<std::string> getPathsFromEnv() {
     std::vector<std::string> paths;
 
-    // Get the value of the PATH environment variable
-
     if (const char* path = std::getenv("PATH")) {
         const std::string path_str(path);
 
-        // Determine the delimiter based on the platform
         const char delimiter = (std::filesystem::is_directory("/")) ? ':' : ';';
 
-        // Split the PATH string based on the delimiter
         std::stringstream ss(path_str);
         std::string item;
         while (std::getline(ss, item, delimiter)) {
@@ -55,7 +49,6 @@ std::vector<std::string> getPathsFromEnv() {
 }
 
 bool isExecutable(const std::filesystem::path& path) {
-    // Check if the file exists and is a regular file
     return exists(path) &&
            is_regular_file(path) &&
            (status(path).permissions() & std::filesystem::perms::owner_exec) != std::filesystem::perms::none;
@@ -93,6 +86,7 @@ void typeCommand(const std::vector<std::string>& args) {
 
     if (const auto it = shellBuiltins.find(command); it != shellBuiltins.end()) {
         std::cout << it->first + " is a shell builtin";
+        return;
     }
 
     std::vector<std::string> paths = getPathsFromEnv();
