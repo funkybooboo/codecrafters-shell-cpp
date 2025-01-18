@@ -38,7 +38,13 @@ void exitCommand(const std::vector<std::string>& args) {
         exit(std::stoi(args[0]));
     }
     catch (const std::invalid_argument& e) {
-        std::cout << "exit: " + args[0] + ": invalid integer";
+        std::cerr << "exit: " + args[0] + ": invalid integer";
+    }
+}
+
+void echoCommand(const std::vector<std::string>& args) {
+    for (const std::string& arg : args) {
+        std::cout << arg + " ";
     }
 }
 
@@ -52,6 +58,7 @@ void exitCommand(const std::vector<std::string>& args) {
 
     // Add commands to the map
     commandMap["exit"] = exitCommand;
+    commandMap["echo"] = echoCommand;
 
     while (true) {
         std::cout << "$ ";
