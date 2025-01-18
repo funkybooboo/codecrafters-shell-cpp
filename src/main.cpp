@@ -41,8 +41,6 @@ std::vector<std::string> getPathsFromEnv() {
         while (std::getline(ss, item, delimiter)) {
             paths.push_back(item);
         }
-    } else {
-        std::cout << "PATH environment variable not found or is empty." << std::endl;
     }
 
     return paths;
@@ -57,7 +55,7 @@ bool isExecutable(const std::filesystem::path& path) {
 std::filesystem::path findCommandInPath(const std::string& command) {
     std::vector<std::string> paths = getPathsFromEnv();
     if (paths.empty()) {
-        return "";
+        std::cout << "PATH environment variable not found or is empty." << std::endl;
     }
 
     for (const auto& dir : paths) {
@@ -83,8 +81,9 @@ void exitCommand(const std::vector<std::string>& args) {
 
 void echoCommand(const std::vector<std::string>& args) {
     for (const std::string& arg : args) {
-        std::cout << arg + " " << std::endl;
+        std::cout << arg + " ";
     }
+    std::cout << std::endl;
 }
 
 void typeCommand(const std::vector<std::string>& args) {
@@ -103,6 +102,7 @@ void typeCommand(const std::vector<std::string>& args) {
     const std::filesystem::path command_path = findCommandInPath(command);
     if (command_path.empty()) {
         std::cerr << command + ": not found" << std::endl;
+        return;
     }
     std::cout << command + " is " + command_path.string() << std::endl;
 }
