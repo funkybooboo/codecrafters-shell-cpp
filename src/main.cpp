@@ -42,7 +42,7 @@ std::vector<std::string> getPathsFromEnv() {
             paths.push_back(item);
         }
     } else {
-        std::cout << "PATH environment variable not found or is empty.";
+        std::cout << "PATH environment variable not found or is empty." << std::endl;
     }
 
     return paths;
@@ -77,34 +77,34 @@ void exitCommand(const std::vector<std::string>& args) {
         exit(std::stoi(args[0]));
     }
     catch (const std::invalid_argument& e) {
-        std::cerr << "exit: " + args[0] + ": invalid integer";
+        std::cerr << "exit: " + args[0] + ": invalid integer" << std::endl;
     }
 }
 
 void echoCommand(const std::vector<std::string>& args) {
     for (const std::string& arg : args) {
-        std::cout << arg + " ";
+        std::cout << arg + " " << std::endl;
     }
 }
 
 void typeCommand(const std::vector<std::string>& args) {
     if (args.empty()) {
-        std::cerr << "type: not enough arguments";
+        std::cerr << "type: not enough arguments" << std::endl;
         return;
     }
 
     const std::string& command = args[0];
 
     if (const auto it = shellBuiltins.find(command); it != shellBuiltins.end()) {
-        std::cout << it->first + " is a shell builtin";
+        std::cout << it->first + " is a shell builtin" << std::endl;
         return;
     }
 
     const std::filesystem::path command_path = findCommandInPath(command);
     if (command_path.empty()) {
-        std::cerr << command + ": not found";
+        std::cerr << command + ": not found" << std::endl;
     }
-    std::cout << command + " is " + command_path.string();
+    std::cout << command + " is " + command_path.string() << std::endl;
 }
 
 void handleInput(const std::string& input) {
@@ -120,7 +120,7 @@ void handleInput(const std::string& input) {
 
     const std::filesystem::path command_path = findCommandInPath(command);
     if (command_path.empty()) {
-        std::cerr << command + ": command not found";
+        std::cerr << command + ": command not found" << std::endl;
         return;
     }
 
@@ -151,7 +151,5 @@ void handleInput(const std::string& input) {
         }
 
         handleInput(input);
-
-        std::cout << std::endl;
     }
 }
