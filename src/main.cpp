@@ -54,8 +54,19 @@ bool isExecutable(const std::filesystem::path& path) {
            (status(path).permissions() & std::filesystem::perms::owner_exec) != std::filesystem::perms::none;
 }
 
-void commandNotFound(const std::string& command) {
-    std::cerr << command + ": command not found";
+std::filesystem::path findCommandInPath(const std::string& command) {
+    std::vector<std::string> paths = getPathsFromEnv();
+    if (paths.empty()) {
+        return "";
+    }
+
+    for (const auto& dir : paths) {
+        if (std::filesystem::path command_path = std::filesystem::path(dir) / command; isExecutable(command_path)) {
+            return command_path;
+        }
+    }
+
+    return "";
 }
 
 void exitCommand(const std::vector<std::string>& args) {
@@ -89,22 +100,39 @@ void typeCommand(const std::vector<std::string>& args) {
         return;
     }
 
-    std::vector<std::string> paths = getPathsFromEnv();
-    if (paths.empty()) {
+    const std::filesystem::path command_path = findCommandInPath(command);
+    if (command_path.empty()) {
+        std::cerr << command + ": not found";
+    }
+    std::cout << command + " is " + command_path.string();
+}
+
+void handleInput(const std::string& input) {
+    const std::vector<std::string> parts = splitString(input, ' ');
+
+    const std::string& command = parts[0];
+    const std::vector<std::string> args = sliceVector(parts, 1);
+
+    if (const auto it = shellBuiltins.find(command); it != shellBuiltins.end()) {
+        it->second(args);
         return;
     }
 
-    bool found = false;
-    for (const auto& dir : paths) {
-        if (std::filesystem::path command_path = std::filesystem::path(dir) / command; isExecutable(command_path)) {
-            std::cout << command + " is " + command_path.string();
-            found = true;
-            break;
-        }
+    const std::filesystem::path command_path = findCommandInPath(command);
+    if (command_path.empty()) {
+        std::cerr << command + ": command not found";
+        return;
     }
 
-    if (!found) {
-        std::cerr << command + ": not found";
+    // Construct the command string
+    std::string full_command = command_path.string();
+    for (const auto& arg : args) {
+        full_command += " " + arg;
+    }
+
+    // Execute the command with arguments
+    if (const int result = std::system(full_command.c_str()); result != 0) {
+        std::cerr << "Error executing the command";
     }
 }
 
@@ -127,17 +155,8 @@ void typeCommand(const std::vector<std::string>& args) {
             continue;
         }
 
-        std::vector<std::string> parts = splitString(input, ' ');
+        handleInput(input);
 
-        const std::string& command = parts[0];
-        const std::vector<std::string> args = sliceVector(parts, 1);
-
-        if (const auto it = shellBuiltins.find(command); it != shellBuiltins.end()) {
-            it->second(args);
-        }
-        else {
-            commandNotFound(command);
-        }
         std::cout << std::endl;
     }
 }
