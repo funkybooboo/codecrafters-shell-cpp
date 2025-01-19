@@ -100,10 +100,12 @@ void echoCommand(const std::vector<std::string>& args) {
     std::string result;
     bool firstArg = true;  // Flag to manage spacing between arguments
 
+    std::string concatenatedArg;  // Variable to concatenate quoted strings
+
     for (const auto& arg : args) {
         std::string cleanedArg = arg;
 
-        // Remove leading and trailing quotes if they exist (both double and single quotes)
+        // Remove leading and trailing quotes if they exist
         while ((!cleanedArg.empty() && (cleanedArg.front() == '"' || cleanedArg.front() == '\'')) ||
                (!cleanedArg.empty() && (cleanedArg.back() == '"' || cleanedArg.back() == '\''))) {
 
@@ -114,19 +116,38 @@ void echoCommand(const std::vector<std::string>& args) {
             if (cleanedArg.back() == '"' || cleanedArg.back() == '\'') {
                 cleanedArg = cleanedArg.substr(0, cleanedArg.size() - 1);
             }
-               }
-
-        // Add space between arguments only if it's not the first argument
-        if (!firstArg) {
-            result += " ";
         }
-        firstArg = false;
 
-        // Add the cleaned argument to the result
-        result += cleanedArg;
+        // If the current argument is not quoted, we finish concatenating the previous quoted segment
+        if (cleanedArg.empty() || cleanedArg.front() != '"') {
+            if (!concatenatedArg.empty()) {
+                if (!firstArg) result += " ";  // Add space between previous concatenated and current
+                result += concatenatedArg;
+                concatenatedArg = "";  // Reset for the next argument
+            }
+            // Add non-quoted argument with spaces
+            if (!firstArg) {
+                result += " ";
+            }
+            result += cleanedArg;
+            firstArg = false;
+        } else {
+            // Continue concatenating quoted strings
+            if (!concatenatedArg.empty()) {
+                concatenatedArg += cleanedArg;
+            } else {
+                concatenatedArg = cleanedArg; // Start new concatenation if no previous
+            }
+            firstArg = false;
+        }
     }
 
-    // Print the result
+    // Add any final concatenated string
+    if (!concatenatedArg.empty()) {
+        if (!firstArg) result += " ";  // Add space before the last concatenation if needed
+        result += concatenatedArg;
+    }
+
     std::cout << result << std::endl;
 }
 
