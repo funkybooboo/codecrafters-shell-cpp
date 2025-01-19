@@ -13,26 +13,53 @@ std::map<std::string, std::function<void(const std::vector<std::string>&)>> shel
 std::vector<std::string> getParts(const std::string& input) {
     std::vector<std::string> tokens;
     std::string token;
-    bool in_quotes = false;
+    bool in_single_quotes = false;
+    bool in_double_quotes = false;
+    bool escape = false;
 
-    for (const char c : input) {
-        if (c == '\'' || c == '"') {
-            in_quotes = !in_quotes;
-            token += c;
-        }
-        else if (c == ' ' && !in_quotes) {
+    for (size_t i = 0; i < input.length(); ++i) {
+        const char c = input[i];
+
+        if (escape) {
+            token += c;  // Escape character, add to token
+            escape = false;
+        } else if (c == '\\') {
+            escape = true;  // Handle escape sequences
+        } else if (c == '\'' && !in_double_quotes) {
+            // Handle single quotes
+            if (in_single_quotes) {
+                in_single_quotes = false;  // Close single quote
+            } else {
+                in_single_quotes = true;  // Open single quote
+            }
+        } else if (c == '"' && !in_single_quotes) {
+            // Handle double quotes
+            if (in_double_quotes) {
+                in_double_quotes = false;  // Close double quote
+            } else {
+                in_double_quotes = true;  // Open double quote
+            }
+        } else if (c == ' ' && !in_single_quotes && !in_double_quotes) {
+            // Space outside of quotes: end of token
             if (!token.empty()) {
                 tokens.push_back(token);
                 token.clear();
             }
-        }
-        else {
+        } else {
+            // Add character to current token
             token += c;
         }
     }
 
+    // Add the last token if any
     if (!token.empty()) {
         tokens.push_back(token);
+    }
+
+    // Check for unterminated quotes
+    if (in_single_quotes || in_double_quotes) {
+        std::cerr << "Syntax error: Unterminated quote detected!" << std::endl;
+        return {};  // Return empty on error
     }
 
     return tokens;
@@ -45,27 +72,29 @@ std::vector<std::string> sliceVector(const std::vector<std::string>& vec, const 
     return {vec.begin() + static_cast<long>(startIndex), vec.end()};
 }
 
+std::string removeSingleQuotes(const std::string& str) {
+    std::string result;
+
+    for (size_t i = 0; i < str.length(); ++i) {
+        if (str[i] == '\'' && i > 0 && i < str.length() - 1 && (str[i - 1] == ' ' || str[i + 1] == ' ')) {
+            continue;
+        }
+        result += str[i];
+    }
+
+    return result;
+}
+
 std::string removeQuotes(const std::string& str) {
     std::string result;
-    const size_t len = str.size();
 
-    for (size_t i = 0; i < len; ++i) {
-        // Check for single quotes
-        if (const char c = str[i]; c == '\'') {
-            // Check if it's a possessive form ('s or something like John')
-            if (i + 1 < len && str[i + 1] == 's' && (i == 0 || isalpha(str[i - 1]))) {
-                // Keep the single quote if it's part of a possessive form
-                result += c;
-            }
-            // Skip single quotes not followed by 's' or not part of a word
-        }
-        // Skip double quotes entirely
-        else if (c != '"') {
+    for (const char c : str) {
+        if (c != '"') {
             result += c;
         }
     }
 
-    return result;
+    return removeSingleQuotes(result);
 }
 
 std::vector<std::string> getPathsFromEnv() {
@@ -214,18 +243,12 @@ void handle(const std::string& input) {
         return;
     }
 
-    const std::filesystem::path command_path = findCommandInPath(command);
-    if (command_path.empty()) {
+    if (const std::filesystem::path command_path = findCommandInPath(command); command_path.empty()) {
         std::cerr << command + ": command not found" << std::endl;
         return;
     }
-
-    std::string full_command = command_path.filename().string();
-    for (const auto& arg : args) {
-        full_command += " " + arg;
-    }
-
-    std::system(full_command.c_str());
+    
+    std::system(input.c_str());
 }
 
 [[noreturn]] int main() {
