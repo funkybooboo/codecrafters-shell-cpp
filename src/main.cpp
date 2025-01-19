@@ -106,6 +106,13 @@ void echoCommand(const std::vector<std::string>& args) {
             arg = arg.substr(1, arg.size() - 2);  // Remove first and last character
             }
 
+        // Replace any occurrence of doubled single quotes ('') with a single quote
+        // This handles embedded quotes like 'world''test'
+        size_t pos = 0;
+        while ((pos = arg.find("''", pos)) != std::string::npos) {
+            arg.replace(pos, 2, ""); // Remove the double single quote pair
+        }
+
         // Print the argument without any extra quotes
         std::cout << arg;
 
