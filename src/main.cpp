@@ -102,15 +102,15 @@ void echoCommand(const std::vector<std::string>& args) {
     for (size_t i = 0; i < args.size(); ++i) {
         std::string arg = args[i];
 
-        // Handle quotes correctly by removing them if they are at the start and end
+        // Strip quotes only from the beginning and end of the argument
         if ((arg.front() == '"' && arg.back() == '"') || (arg.front() == '\'' && arg.back() == '\'')) {
-            arg = arg.substr(1, arg.size() - 2);  // Strip leading and trailing quotes
+            arg = arg.substr(1, arg.size() - 2);  // Remove surrounding quotes
         }
 
-        // Append the argument to the result
+        // Concatenate each argument into the result
         result += arg;
 
-        // Add a space only if it's not the last argument
+        // Add space between arguments, but not after the last argument
         if (i != args.size() - 1) {
             result += " ";
         }
