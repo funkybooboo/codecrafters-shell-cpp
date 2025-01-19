@@ -97,12 +97,22 @@ void exitCommand(const std::vector<std::string>& args) {
 }
 
 void echoCommand(const std::vector<std::string>& args) {
-    for (std::string arg : args) {
-        if ((arg.front() == '"' && arg.back() == '"') || (arg.front() == '\'' && arg.back() == '\'')) {
-            arg = arg.substr(1, arg.size() - 2);
-        }
+    for (size_t i = 0; i < args.size(); ++i) {
+        std::string arg = args[i];
+
+        // Remove surrounding quotes if present
+        if ((arg.front() == '"' && arg.back() == '"') ||
+            (arg.front() == '\'' && arg.back() == '\'')) {
+            arg = arg.substr(1, arg.size() - 2);  // Remove first and last character
+            }
+
+        // Print the argument without any extra quotes
         std::cout << arg;
-        std::cout << " ";
+
+        // Print space between arguments if not the last argument
+        if (i != args.size() - 1) {
+            std::cout << " ";
+        }
     }
     std::cout << std::endl;
 }
