@@ -97,6 +97,8 @@ void exitCommand(const std::vector<std::string>& args) {
 }
 
 void echoCommand(const std::vector<std::string>& args) {
+    std::string result;
+
     for (size_t i = 0; i < args.size(); ++i) {
         std::string arg = args[i];
 
@@ -105,20 +107,16 @@ void echoCommand(const std::vector<std::string>& args) {
             arg = arg.substr(1, arg.size() - 2);  // Strip leading and trailing quotes
         }
 
-        // Remove any instance of consecutive single quotes within the string
-        size_t pos = 0;
-        while ((pos = arg.find("''", pos)) != std::string::npos) {
-            arg.replace(pos, 2, "");  // Replace consecutive single quotes with nothing
-        }
+        // Append the argument to the result
+        result += arg;
 
-        std::cout << arg;
-
-        // Print a space between arguments except for the last one
+        // Add a space only if it's not the last argument
         if (i != args.size() - 1) {
-            std::cout << " ";
+            result += " ";
         }
     }
-    std::cout << std::endl;
+
+    std::cout << result << std::endl;
 }
 
 void typeCommand(const std::vector<std::string>& args) {
