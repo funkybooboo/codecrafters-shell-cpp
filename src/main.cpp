@@ -47,11 +47,24 @@ std::vector<std::string> sliceVector(const std::vector<std::string>& vec, const 
 
 std::string removeQuotes(const std::string& str) {
     std::string result;
-    for (const char c : str) {
-        if (c != '"' && c != '\'') {  // Skip quotes
+    const size_t len = str.size();
+
+    for (size_t i = 0; i < len; ++i) {
+        // Check for single quotes
+        if (const char c = str[i]; c == '\'') {
+            // Check if it's a possessive form ('s or something like John')
+            if (i + 1 < len && str[i + 1] == 's' && (i == 0 || isalpha(str[i - 1]))) {
+                // Keep the single quote if it's part of a possessive form
+                result += c;
+            }
+            // Skip single quotes not followed by 's' or not part of a word
+        }
+        // Skip double quotes entirely
+        else if (c != '"') {
             result += c;
         }
     }
+
     return result;
 }
 
