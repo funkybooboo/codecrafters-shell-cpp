@@ -18,6 +18,7 @@ std::vector<std::string> getParts(const std::string& input) {
     for (const char c : input) {
         if (c == '\'' || c == '"') {
             in_quotes = !in_quotes;
+            token += c;
         }
         else if (c == ' ' && !in_quotes) {
             if (!token.empty()) {
@@ -96,7 +97,11 @@ void exitCommand(const std::vector<std::string>& args) {
 }
 
 void echoCommand(const std::vector<std::string>& args) {
-    for (const std::string& arg : args) {
+    for (std::string arg : args) {
+        if ((arg.front() == '"' && arg.back() == '"') ||
+            (arg.front() == '\'' && arg.back() == '\'')) {
+            arg = arg.substr(1, arg.size() - 2);
+        }
         std::cout << arg + " ";
     }
     std::cout << std::endl;
