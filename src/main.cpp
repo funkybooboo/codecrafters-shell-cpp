@@ -100,17 +100,20 @@ void echoCommand(const std::vector<std::string>& args) {
     for (size_t i = 0; i < args.size(); ++i) {
         std::string arg = args[i];
 
+        // Handle quotes correctly by removing them if they are at the start and end
         if ((arg.front() == '"' && arg.back() == '"') || (arg.front() == '\'' && arg.back() == '\'')) {
-            arg = arg.substr(1, arg.size() - 2);
+            arg = arg.substr(1, arg.size() - 2);  // Strip leading and trailing quotes
         }
 
+        // Remove any instance of consecutive single quotes within the string
         size_t pos = 0;
         while ((pos = arg.find("''", pos)) != std::string::npos) {
-            arg.replace(pos, 2, "");
+            arg.replace(pos, 2, "");  // Replace consecutive single quotes with nothing
         }
 
         std::cout << arg;
 
+        // Print a space between arguments except for the last one
         if (i != args.size() - 1) {
             std::cout << " ";
         }
