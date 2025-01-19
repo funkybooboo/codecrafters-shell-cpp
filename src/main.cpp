@@ -47,11 +47,33 @@ std::vector<std::string> sliceVector(const std::vector<std::string>& vec, const 
 
 std::string removeQuotes(const std::string& str) {
     std::string result;
+    bool insideSingleQuote = false;
+    bool insideDoubleQuote = false;
+
     for (const char ch : str) {
-        if (ch != '"' && ch != '\'') {
+        if (ch == '\'' && !insideDoubleQuote) {
+            if (insideSingleQuote) {
+                insideSingleQuote = false;
+                continue;
+            }
+            insideSingleQuote = true;
+            continue;
+        }
+
+        if (ch == '\"' && !insideSingleQuote) {
+            if (insideDoubleQuote) {
+                insideDoubleQuote = false;
+                continue;
+            }
+            insideDoubleQuote = true;
+            continue;
+        }
+
+        if (!insideSingleQuote && !insideDoubleQuote) {
             result += ch;
         }
     }
+
     return result;
 }
 
