@@ -10,12 +10,28 @@
 
 std::map<std::string, std::function<void(const std::vector<std::string>&)>> shellBuiltins;
 
-std::vector<std::string> splitString(const std::string& str, const char delimiter) {
+std::vector<std::string> getParts(const std::string& input) {
     std::vector<std::string> tokens;
-    std::istringstream stream(str);
     std::string token;
+    bool in_quotes = false;
 
-    while (std::getline(stream, token, delimiter)) {
+    for (const char c : input) {
+        if (c == '\'' || c == '"') {
+            in_quotes = !in_quotes;
+            token += c;
+        }
+        else if (c == ' ' && !in_quotes) {
+            if (!token.empty()) {
+                tokens.push_back(token);
+                token.clear();
+            }
+        }
+        else {
+            token += c;
+        }
+    }
+
+    if (!token.empty()) {
         tokens.push_back(token);
     }
 
@@ -157,7 +173,11 @@ void cdCommand(const std::vector<std::string>& args) {
 }
 
 void handle(const std::string& input) {
-    const std::vector<std::string> parts = splitString(input, ' ');
+    if (input.empty()) {
+        return;
+    }
+
+    const std::vector<std::string> parts = getParts(input);
 
     const std::string& command = parts[0];
     const std::vector<std::string> args = sliceVector(parts, 1);
@@ -196,10 +216,6 @@ void handle(const std::string& input) {
 
         std::string input;
         std::getline(std::cin, input);
-
-        if (input.empty()) {
-            continue;
-        }
 
         handle(input);
     }
