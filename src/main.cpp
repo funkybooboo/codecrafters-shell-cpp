@@ -99,21 +99,29 @@ void exitCommand(const std::vector<std::string>& args) {
 void echoCommand(const std::vector<std::string>& args) {
     std::string result;
 
-    for (size_t i = 0; i < args.size(); ++i) {
-        std::string arg = args[i];
+    bool firstArg = true;  // Flag to manage spacing between arguments
 
-        // Remove surrounding quotes if they exist
-        if ((arg.front() == '"' && arg.back() == '"') || (arg.front() == '\'' && arg.back() == '\'')) {
-            arg = arg.substr(1, arg.size() - 2);  // Strip leading and trailing quotes
+    for (const auto& arg : args) {
+        std::string cleanedArg = arg;
+
+        // Remove leading and trailing quotes if they exist
+        if (!cleanedArg.empty() && (cleanedArg.front() == '"' || cleanedArg.front() == '\'')) {
+            // Remove leading quote
+            cleanedArg = cleanedArg.substr(1);
+        }
+        if (!cleanedArg.empty() && (cleanedArg.back() == '"' || cleanedArg.back() == '\'')) {
+            // Remove trailing quote
+            cleanedArg = cleanedArg.substr(0, cleanedArg.size() - 1);
         }
 
-        // Append the argument to the result string
-        result += arg;
-
-        // Only add a space between arguments if it's not the last argument
-        if (i != args.size() - 1) {
+        // Add space between arguments only if it's not the first argument
+        if (!firstArg) {
             result += " ";
         }
+        firstArg = false;
+
+        // Add the cleaned argument to the result
+        result += cleanedArg;
     }
 
     std::cout << result << std::endl;
