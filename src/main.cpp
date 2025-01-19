@@ -45,6 +45,16 @@ std::vector<std::string> sliceVector(const std::vector<std::string>& vec, const 
     return {vec.begin() + static_cast<long>(startIndex), vec.end()};
 }
 
+std::string removeQuotes(const std::string& str) {
+    std::string result;
+    for (const char ch : str) {
+        if (ch != '"' && ch != '\'') {
+            result += ch;
+        }
+    }
+    return result;
+}
+
 std::vector<std::string> getPathsFromEnv() {
     std::vector<std::string> paths;
 
@@ -97,58 +107,14 @@ void exitCommand(const std::vector<std::string>& args) {
 }
 
 void echoCommand(const std::vector<std::string>& args) {
-    std::string result;
-    bool firstArg = true;  // Flag to manage spacing between arguments
-
-    std::string concatenatedArg;  // Variable to concatenate quoted strings
-
-    for (const auto& arg : args) {
-        std::string cleanedArg = arg;
-
-        // Remove leading and trailing quotes if they exist
-        while ((!cleanedArg.empty() && (cleanedArg.front() == '"' || cleanedArg.front() == '\'')) ||
-               (!cleanedArg.empty() && (cleanedArg.back() == '"' || cleanedArg.back() == '\''))) {
-
-            // Remove leading or trailing quote
-            if (cleanedArg.front() == '"' || cleanedArg.front() == '\'') {
-                cleanedArg = cleanedArg.substr(1);
-            }
-            if (cleanedArg.back() == '"' || cleanedArg.back() == '\'') {
-                cleanedArg = cleanedArg.substr(0, cleanedArg.size() - 1);
-            }
-        }
-
-        // If the current argument is not quoted, we finish concatenating the previous quoted segment
-        if (cleanedArg.empty() || cleanedArg.front() != '"') {
-            if (!concatenatedArg.empty()) {
-                if (!firstArg) result += " ";  // Add space between previous concatenated and current
-                result += concatenatedArg;
-                concatenatedArg = "";  // Reset for the next argument
-            }
-            // Add non-quoted argument with spaces
-            if (!firstArg) {
-                result += " ";
-            }
-            result += cleanedArg;
-            firstArg = false;
-        } else {
-            // Continue concatenating quoted strings
-            if (!concatenatedArg.empty()) {
-                concatenatedArg += cleanedArg;
-            } else {
-                concatenatedArg = cleanedArg; // Start new concatenation if no previous
-            }
-            firstArg = false;
-        }
+    if (args.empty()) {
+        return;
     }
 
-    // Add any final concatenated string
-    if (!concatenatedArg.empty()) {
-        if (!firstArg) result += " ";  // Add space before the last concatenation if needed
-        result += concatenatedArg;
+    for (const std::string& arg : args) {
+        std::cout << removeQuotes(arg) << " ";
     }
-
-    std::cout << result << std::endl;
+    std::cout << std::endl;
 }
 
 void typeCommand(const std::vector<std::string>& args) {
