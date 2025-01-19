@@ -100,23 +100,17 @@ void echoCommand(const std::vector<std::string>& args) {
     for (size_t i = 0; i < args.size(); ++i) {
         std::string arg = args[i];
 
-        // Remove surrounding quotes if present
-        if ((arg.front() == '"' && arg.back() == '"') ||
-            (arg.front() == '\'' && arg.back() == '\'')) {
-            arg = arg.substr(1, arg.size() - 2);  // Remove first and last character
-            }
-
-        // Replace any occurrence of doubled single quotes ('') with a single quote
-        // This handles embedded quotes like 'world''test'
-        size_t pos = 0;
-        while ((pos = arg.find("''", pos)) != std::string::npos) {
-            arg.replace(pos, 2, ""); // Remove the double single quote pair
+        if ((arg.front() == '"' && arg.back() == '"') || (arg.front() == '\'' && arg.back() == '\'')) {
+            arg = arg.substr(1, arg.size() - 2);
         }
 
-        // Print the argument without any extra quotes
+        size_t pos = 0;
+        while ((pos = arg.find("''", pos)) != std::string::npos) {
+            arg.replace(pos, 2, "");
+        }
+
         std::cout << arg;
 
-        // Print space between arguments if not the last argument
         if (i != args.size() - 1) {
             std::cout << " ";
         }
