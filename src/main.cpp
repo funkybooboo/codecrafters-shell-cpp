@@ -107,12 +107,12 @@ void echoCommand(const std::vector<std::string>& args) {
             arg = arg.substr(1, arg.size() - 2);  // Remove surrounding quotes
         }
 
-        // Concatenate each argument into the result
-        result += arg;
-
-        // Add space between arguments, but not after the last argument
-        if (i != args.size() - 1) {
-            result += " ";
+        // If it's the first argument, just add it
+        if (i == 0) {
+            result += arg;
+        } else {
+            // For subsequent arguments, merge them with no space and no additional quotes
+            result += arg;
         }
     }
 
