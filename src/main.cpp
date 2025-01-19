@@ -98,20 +98,17 @@ void exitCommand(const std::vector<std::string>& args) {
 
 void echoCommand(const std::vector<std::string>& args) {
     std::string result;
-
     bool firstArg = true;  // Flag to manage spacing between arguments
 
     for (const auto& arg : args) {
         std::string cleanedArg = arg;
 
-        // Remove leading and trailing quotes if they exist
+        // Remove leading and trailing quotes if they exist (both double and single quotes)
         if (!cleanedArg.empty() && (cleanedArg.front() == '"' || cleanedArg.front() == '\'')) {
-            // Remove leading quote
-            cleanedArg = cleanedArg.substr(1);
+            cleanedArg = cleanedArg.substr(1);  // Remove leading quote
         }
         if (!cleanedArg.empty() && (cleanedArg.back() == '"' || cleanedArg.back() == '\'')) {
-            // Remove trailing quote
-            cleanedArg = cleanedArg.substr(0, cleanedArg.size() - 1);
+            cleanedArg = cleanedArg.substr(0, cleanedArg.size() - 1);  // Remove trailing quote
         }
 
         // Add space between arguments only if it's not the first argument
@@ -124,6 +121,7 @@ void echoCommand(const std::vector<std::string>& args) {
         result += cleanedArg;
     }
 
+    // Print the result
     std::cout << result << std::endl;
 }
 
