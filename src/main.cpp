@@ -18,7 +18,6 @@ std::vector<std::string> getParts(const std::string& input) {
     for (const char c : input) {
         if (c == '\'' || c == '"') {
             in_quotes = !in_quotes;
-            token += c;
         }
         else if (c == ' ' && !in_quotes) {
             if (!token.empty()) {
