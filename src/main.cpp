@@ -104,12 +104,17 @@ void echoCommand(const std::vector<std::string>& args) {
         std::string cleanedArg = arg;
 
         // Remove leading and trailing quotes if they exist (both double and single quotes)
-        if (!cleanedArg.empty() && (cleanedArg.front() == '"' || cleanedArg.front() == '\'')) {
-            cleanedArg = cleanedArg.substr(1);  // Remove leading quote
-        }
-        if (!cleanedArg.empty() && (cleanedArg.back() == '"' || cleanedArg.back() == '\'')) {
-            cleanedArg = cleanedArg.substr(0, cleanedArg.size() - 1);  // Remove trailing quote
-        }
+        while ((!cleanedArg.empty() && (cleanedArg.front() == '"' || cleanedArg.front() == '\'')) ||
+               (!cleanedArg.empty() && (cleanedArg.back() == '"' || cleanedArg.back() == '\''))) {
+
+            // Remove leading or trailing quote
+            if (cleanedArg.front() == '"' || cleanedArg.front() == '\'') {
+                cleanedArg = cleanedArg.substr(1);
+            }
+            if (cleanedArg.back() == '"' || cleanedArg.back() == '\'') {
+                cleanedArg = cleanedArg.substr(0, cleanedArg.size() - 1);
+            }
+               }
 
         // Add space between arguments only if it's not the first argument
         if (!firstArg) {
