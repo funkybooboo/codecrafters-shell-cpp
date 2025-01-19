@@ -98,11 +98,11 @@ void exitCommand(const std::vector<std::string>& args) {
 
 void echoCommand(const std::vector<std::string>& args) {
     for (std::string arg : args) {
-        if ((arg.front() == '"' && arg.back() == '"') ||
-            (arg.front() == '\'' && arg.back() == '\'')) {
+        if ((arg.front() == '"' && arg.back() == '"') || (arg.front() == '\'' && arg.back() == '\'')) {
             arg = arg.substr(1, arg.size() - 2);
         }
-        std::cout << arg + " ";
+        std::cout << arg;
+        std::cout << " ";
     }
     std::cout << std::endl;
 }
