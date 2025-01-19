@@ -47,11 +47,34 @@ std::vector<std::string> sliceVector(const std::vector<std::string>& vec, const 
 
 std::string removeQuotes(const std::string& str) {
     std::string result;
-    for (char c : str) {
-        if (c != '"' && c != '\'') {  // Skip quotes
+    std::vector isSingleQuotePair(str.size(), false); // To track paired single quotes
+    bool insidePair = false;  // Flag to track whether we are inside a pair of single quotes
+
+    // First pass: Identify paired single quotes
+    for (size_t i = 0; i < str.size(); ++i) {
+        if (str[i] == '\'' && !insidePair) {
+            insidePair = true;
+            // Mark the position as part of a single quote pair
+            isSingleQuotePair[i] = true;
+        } else if (str[i] == '\'' && insidePair) {
+            insidePair = false;
+            // Mark the position as part of a single quote pair
+            isSingleQuotePair[i] = true;
+        }
+    }
+
+    // Second pass: Build the result string
+    for (size_t i = 0; i < str.size(); ++i) {
+        if (const char c = str[i]; c != '"') {
+            if (c == '\'' && isSingleQuotePair[i]) {
+                // Skip single quotes that are part of a pair
+                continue;
+            }
+            // Otherwise, append the character
             result += c;
         }
     }
+
     return result;
 }
 
