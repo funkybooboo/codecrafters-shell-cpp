@@ -31,7 +31,7 @@ std::string getCommand(const std::string& input)
 
         std::string command = getCommand(input);
 
-        std::string argument = input.substr(command.length() + 1);
+        std::string argument = input.substr(command.length());
 
         if (const auto it = builtins::registry.find(command); it != builtins::registry.end())
         {
