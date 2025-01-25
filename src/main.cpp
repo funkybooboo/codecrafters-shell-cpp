@@ -1,26 +1,45 @@
-#include <iostream>
+#include "builtins.hpp"
 
-int main() {
-    // Flush after every std::cout / std:cerr
-    std::cout << std::unitbuf;
-    std::cerr << std::unitbuf;
-
-    std::cout << "$ ";
-    std::string input;
-
-    while (std::getline(std::cin, input) && input.find("exit") != 0)
+std::string getCommand(const std::string& input)
+{
+    std::string command;
+    for (const char c : input)
     {
-        if (input.find("echo ") == 0)
+        if (c == ' ')
         {
-            constexpr int ECHO_LEN = 5; // Including space
-            std::string text = input.substr(ECHO_LEN);
-            std::cout << text << std::endl;
+            break;
+        }
+        command += c;
+    }
+    return command;
+}
+
+[[noreturn]]int main() {
+    builtins::loadRegistry();
+
+    while (true)
+    {
+        std::cout << "$ ";
+
+        std::string input;
+        std::getline(std::cin, input);
+
+        if (input.empty())
+        {
+            continue;
+        }
+
+        std::string command = getCommand(input);
+
+        std::string argument = input.substr(command.length() + 1);
+
+        if (const auto it = builtins::registry.find(command); it != builtins::registry.end())
+        {
+            it->second(argument);
         }
         else
         {
-            std::cout << input << ": command not found" << std::endl;
+            std::cout << command << ": command not found" << std::endl;
         }
-
-        std::cout << "$ ";
     }
 }
