@@ -1,7 +1,9 @@
 #include <iostream>
+#include <unistd.h>
 
 #include "builtins.hpp"
 #include "environment.hpp"
+#include "utils.hpp"
 
 namespace builtins
 {
@@ -40,10 +42,60 @@ namespace builtins
         std::cerr << argument + ": not found" << std::endl;
     }
 
+    void pwd([[maybe_unused]] const std::string& argument) {
+        const std::filesystem::path current_path = std::filesystem::current_path();
+        std::cout << current_path.string() << std::endl;
+    }
+
+    void cd(const std::string& argument) {
+        if (argument.empty()) {
+            return;
+        }
+
+        std::string newDirStr = utils::getToken(argument);
+
+        if (newDirStr == "~") {
+            if (const char* homeDir = std::getenv("HOME"); homeDir != nullptr) {
+                newDirStr = homeDir;
+            }
+            else {
+                std::cerr << "cd: $HOME not set" << std::endl;
+                return;
+            }
+        }
+        else if (newDirStr.starts_with("~/")) {
+            if (const char* homeDir = std::getenv("HOME"); homeDir != nullptr) {
+                newDirStr.replace(0, 1, homeDir);
+            }
+            else {
+                std::cerr << "cd: $HOME not set" << std::endl;
+                return;
+            }
+        }
+
+        std::filesystem::path newDir = newDirStr;
+
+        if (!newDir.is_absolute()) {
+            const std::filesystem::path currentDir = std::filesystem::current_path();
+            newDir = currentDir / newDir;
+        }
+
+        if (!exists(newDir)) {
+            std::cerr << "cd: " + newDir.string() + ": No such file or directory" << std::endl;
+            return;
+        }
+
+        if (chdir(newDir.c_str()) != 0) {
+            std::cerr << "cd: " + newDir.string() + ": No such file or directory" << std::endl;
+        }
+    }
+
     void loadRegistry()
     {
         registry["exit"] = exit;
         registry["echo"] = echo;
         registry["type"] = type;
+        registry["pwd"] = pwd;
+        registry["cd"] = cd;
     }
 } // namespace builtins

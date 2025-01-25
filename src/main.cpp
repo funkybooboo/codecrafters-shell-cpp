@@ -1,24 +1,10 @@
 #include <iostream>
-#include <cstdint>
 #include <optional>
 #include <filesystem>
 
+#include "utils.hpp"
 #include "builtins.hpp"
 #include "environment.hpp"
-
-std::string getCommand(const std::string& input)
-{
-    std::string command;
-    for (const char c : input)
-    {
-        if (c == ' ')
-        {
-            break;
-        }
-        command += c;
-    }
-    return command;
-}
 
 [[noreturn]] int main()
 {
@@ -36,7 +22,7 @@ std::string getCommand(const std::string& input)
             continue;
         }
 
-        std::string command = getCommand(input);
+        std::string command = utils::getToken(input);
 
         std::string argument = input.substr(command.length());
 
