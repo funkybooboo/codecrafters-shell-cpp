@@ -33,6 +33,11 @@ std::string getCommand(const std::string& input)
 
         std::string argument = input.substr(command.length());
 
+        if (argument[0] == ' ')
+        {
+            argument = argument.substr(1);
+        }
+
         if (const auto it = builtins::registry.find(command); it != builtins::registry.end())
         {
             it->second(argument);
