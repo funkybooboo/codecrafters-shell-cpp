@@ -39,7 +39,7 @@ std::string getCommand(const std::string& input)
         }
         else
         {
-            std::cout << command << ": command not found" << std::endl;
+            std::cout << input << ": command not found" << std::endl;
         }
     }
 }
