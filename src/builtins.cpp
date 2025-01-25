@@ -5,23 +5,27 @@
 
 namespace builtins
 {
-    std::optional<std::int32_t> exit([[maybe_unused]] const std::string& argument)
+    void exit(const std::string& argument)
     {
-        return 0;
+        try {
+            const std::int32_t statusCode = std::stoi(argument);
+            std::exit(statusCode);
+        } catch (const std::exception&) {
+            std::exit(0);
+        }
     }
 
-    std::optional<std::int32_t> echo(const std::string& argument)
+    void echo(const std::string& argument)
     {
         std::cout << argument << std::endl;
-        return {};
     }
 
-    std::optional<std::int32_t> type(const std::string& argument)
+    void type(const std::string& argument)
     {
         if (const auto it = registry.find(argument); it != registry.end())
         {
             std::cout << it->first << " is a shell builtin" << std::endl;
-            return {};
+            return;
         }
 
         if (const std::optional<std::filesystem::path> result = environment::getCommandPath(argument))
@@ -29,13 +33,11 @@ namespace builtins
             if (const std::filesystem::path& command_path = *result; environment::isExecutable(command_path))
             {
                 std::cout << argument + " is " + command_path.string() << std::endl;
-                return {};
+                return;
             }
         }
 
         std::cerr << argument + ": not found" << std::endl;
-
-        return {};
     }
 
     void loadRegistry()

@@ -20,7 +20,7 @@ std::string getCommand(const std::string& input)
     return command;
 }
 
-[[noreturn]]int main()
+[[noreturn]] int main()
 {
     builtins::loadRegistry();
 
@@ -47,10 +47,7 @@ std::string getCommand(const std::string& input)
 
         if (const auto it = builtins::registry.find(command); it != builtins::registry.end())
         {
-            if (const std::optional<std::int32_t> result = it->second(argument)) {
-                const std::int32_t status = *result;
-                std::exit(status);
-            }
+            it->second(argument);
             continue;
         }
 
@@ -59,9 +56,10 @@ std::string getCommand(const std::string& input)
             if (const std::filesystem::path& command_path = *result; environment::isExecutable(command_path))
             {
                 std::system(input.c_str());
+                continue;
             }
         }
-        
+
         std::cout << input << ": command not found" << std::endl;
     }
 }
