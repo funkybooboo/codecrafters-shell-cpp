@@ -1,38 +1,41 @@
+#include <iostream>
+
 #include "builtins.hpp"
+#include "environment.hpp"
 
 namespace builtins
 {
-    void exit(const std::string& argument)
+    std::optional<std::int32_t> exit([[maybe_unused]] const std::string& argument)
     {
-        std::exit(0);
+        return 0;
     }
 
-    void echo(const std::string& argument)
+    std::optional<std::int32_t> echo(const std::string& argument)
     {
         std::cout << argument << std::endl;
+        return {};
     }
 
-    void type(const std::string& argument)
+    std::optional<std::int32_t> type(const std::string& argument)
     {
         if (const auto it = registry.find(argument); it != registry.end())
         {
             std::cout << it->first << " is a shell builtin" << std::endl;
-            return;
+            return {};
         }
 
-        std::optional<std::filesystem::path> result = environment::getCommandPath(argument);
-
-        if (result)
+        if (const std::optional<std::filesystem::path> result = environment::getCommandPath(argument))
         {
-            std::filesystem::path command_path = *result;
-            if (environment::isExecutable(command_path))
+            if (const std::filesystem::path& command_path = *result; environment::isExecutable(command_path))
             {
                 std::cout << argument + " is " + command_path.string() << std::endl;
-                return;
+                return {};
             }
         }
 
         std::cerr << argument + ": not found" << std::endl;
+
+        return {};
     }
 
     void loadRegistry()

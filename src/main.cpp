@@ -1,4 +1,10 @@
+#include <iostream>
+#include <cstdint>
+#include <optional>
+#include <filesystem>
+
 #include "builtins.hpp"
+#include "environment.hpp"
 
 std::string getCommand(const std::string& input)
 {
@@ -41,11 +47,21 @@ std::string getCommand(const std::string& input)
 
         if (const auto it = builtins::registry.find(command); it != builtins::registry.end())
         {
-            it->second(argument);
+            if (const std::optional<std::int32_t> result = it->second(argument)) {
+                const std::int32_t status = *result;
+                std::exit(status);
+            }
+            continue;
         }
-        else
+
+        if (const std::optional<std::filesystem::path> result = environment::getCommandPath(argument))
         {
-            std::cout << input << ": command not found" << std::endl;
+            if (const std::filesystem::path& command_path = *result; environment::isExecutable(command_path))
+            {
+                std::system(input.c_str());
+            }
         }
+        
+        std::cout << input << ": command not found" << std::endl;
     }
 }
