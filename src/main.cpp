@@ -14,7 +14,8 @@ std::string getCommand(const std::string& input)
     return command;
 }
 
-[[noreturn]]int main() {
+[[noreturn]]int main()
+{
     builtins::loadRegistry();
 
     while (true)
@@ -33,7 +34,7 @@ std::string getCommand(const std::string& input)
 
         std::string argument = input.substr(command.length());
 
-        if (argument[0] == ' ')
+        if (!argument.empty() && argument[0] == ' ')
         {
             argument = argument.substr(1);
         }

@@ -3,12 +3,12 @@
 #include <string>
 #include <map>
 #include <functional>
-#include <iostream>
 
-namespace builtins {
+#include "environment.hpp"
 
-    inline std::map<std::string, std::function<void(const std::string&)>> registry;
+namespace builtins
+{
+  inline std::map<std::string, std::function<void(const std::string&)>> registry;
 
-    void loadRegistry();
-
+  void loadRegistry();
 } // namespace builtins

@@ -1,7 +1,7 @@
 #include "builtins.hpp"
 
-namespace builtins {
-
+namespace builtins
+{
     void exit(const std::string& argument)
     {
         std::exit(0);
@@ -17,11 +17,22 @@ namespace builtins {
         if (const auto it = registry.find(argument); it != registry.end())
         {
             std::cout << it->first << " is a shell builtin" << std::endl;
+            return;
         }
-        else
+
+        std::optional<std::filesystem::path> result = environment::getCommandPath(argument);
+
+        if (result)
         {
-            std::cout << argument << ": not found" << std::endl;
+            std::filesystem::path command_path = *result;
+            if (environment::isExecutable(command_path))
+            {
+                std::cout << argument + " is " + command_path.string() << std::endl;
+                return;
+            }
         }
+
+        std::cerr << argument + ": not found" << std::endl;
     }
 
     void loadRegistry()
@@ -30,5 +41,4 @@ namespace builtins {
         registry["echo"] = echo;
         registry["type"] = type;
     }
-
 } // namespace builtins
