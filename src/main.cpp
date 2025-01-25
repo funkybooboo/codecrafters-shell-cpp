@@ -54,7 +54,7 @@ std::string getCommand(const std::string& input)
             continue;
         }
 
-        if (const std::optional<std::filesystem::path> result = environment::getCommandPath(argument))
+        if (const std::optional<std::filesystem::path> result = environment::getCommandPath(command))
         {
             if (const std::filesystem::path& command_path = *result; environment::isExecutable(command_path))
             {
