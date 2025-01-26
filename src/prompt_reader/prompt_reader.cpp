@@ -63,9 +63,9 @@ namespace prompt_reader
             commandPart = input;
         }
 
-        if (const std::string match = findClosestMatch(commandPart, builtins::builtinNames); match != commandPart)
+        if (std::string match = findClosestMatch(commandPart, builtins::builtinNames); match != commandPart)
         {
-            commandPart += " ";
+            match += " ";
             input.replace(0, commandPart.length(), match);
             cursorPos = match.length();
             std::cout << "\r$ " << input;
