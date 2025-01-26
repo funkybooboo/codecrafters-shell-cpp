@@ -16,7 +16,7 @@ namespace builtins
         {
             const char c = argument[i];
 
-            if (c == '\"')
+            if (c == '\"' && !isInSingleQuote)
             {
                 isInDoubleQuote = !isInDoubleQuote;
                 i++;
@@ -37,6 +37,13 @@ namespace builtins
                 continue;
             }
 
+            if (isInSingleQuote)
+            {
+                output += c;
+                i++;
+                continue;
+            }
+
             if (c == '\\')
             {
                 output += argument[i + 1];
@@ -45,13 +52,6 @@ namespace builtins
             }
 
             if (c != ' ')
-            {
-                output += c;
-                i++;
-                continue;
-            }
-
-            if (isInSingleQuote)
             {
                 output += c;
                 i++;
