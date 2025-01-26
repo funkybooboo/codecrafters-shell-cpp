@@ -2,7 +2,9 @@
 
 #include <string>
 
+#include "../builtins.hpp"
+
 namespace builtins
 {
-    void type(const std::string& argument);
+    Result type(const std::string& argument);
 }

@@ -19,4 +19,8 @@ add_executable(shell ${SOURCE_FILES}
         src/builtins/pwd/pwd.hpp
         src/builtins/type/type.cpp
         src/builtins/type/type.hpp
+        src/command_parser/command_parser.cpp
+        src/command_parser/command_parser.hpp
+        src/utils/utils.hpp
+        src/utils/utils.cpp
 )

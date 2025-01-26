@@ -1,4 +1,3 @@
-#include <iostream>
 #include <filesystem>
 #include <unistd.h>
 
@@ -6,9 +5,9 @@
 
 namespace builtins
 {
-    void cd(const std::string& argument) {
+    Result cd(const std::string& argument) {
         if (argument.empty()) {
-            return;
+            return {0, ""};
         }
 
         std::string newDirStr = argument;
@@ -18,8 +17,7 @@ namespace builtins
                 newDirStr = homeDir;
             }
             else {
-                std::cerr << "cd: $HOME not set" << std::endl;
-                return;
+                return {1, "cd: $HOME not set"};
             }
         }
         else if (newDirStr.starts_with("~/")) {
@@ -27,8 +25,7 @@ namespace builtins
                 newDirStr.replace(0, 1, homeDir);
             }
             else {
-                std::cerr << "cd: $HOME not set" << std::endl;
-                return;
+                return {1, "cd: $HOME not set"};
             }
         }
 
@@ -40,12 +37,13 @@ namespace builtins
         }
 
         if (!exists(newDir)) {
-            std::cerr << "cd: " + newDir.string() + ": No such file or directory" << std::endl;
-            return;
+            return {1, "cd: " + newDir.string() + ": No such file or directory"};
         }
 
         if (chdir(newDir.c_str()) != 0) {
-            std::cerr << "cd: " + newDir.string() + ": No such file or directory" << std::endl;
+            return {1, "cd: " + newDir.string() + ": No such file or directory"};
         }
+
+        return {0, ""};
     }
 }

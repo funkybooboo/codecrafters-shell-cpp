@@ -4,62 +4,14 @@
 
 #include "builtins/builtins.hpp"
 #include "environment/environment.hpp"
-
-std::string trim(const std::string& str) {
-    const size_t start = str.find_first_not_of(' ');
-    if (start == std::string::npos) {
-        return "";
-    }
-
-    const size_t end = str.find_last_not_of(' ');
-
-    return str.substr(start, end - start + 1);
-}
-
-std::string getCommand(const std::string& input)
-{
-    bool isInDoubleQuote = false;
-    bool isInSingleQuote = false;
-
-    std::string command;
-    for (const char c : input)
-    {
-        if (c == '\"' && !isInSingleQuote)
-        {
-            isInDoubleQuote = !isInDoubleQuote;
-            continue;
-        }
-
-        if (isInDoubleQuote)
-        {
-            command += c;
-            continue;
-        }
-
-        if (c == '\'')
-        {
-            isInSingleQuote = !isInSingleQuote;
-            continue;
-        }
-
-        if (isInSingleQuote)
-        {
-            command += c;
-            continue;
-        }
-
-        if (c == ' ')
-        {
-            break;
-        }
-
-        command += c;
-    }
-    return command;
-}
+#include "command_parser/command_parser.hpp"
+#include "utils/utils.hpp"
 
 [[noreturn]] int main()
 {
+    std::cout << std::unitbuf;
+    std::cerr << std::unitbuf;
+
     builtins::loadRegistry();
 
     while (true)
@@ -69,39 +21,27 @@ std::string getCommand(const std::string& input)
         std::string input;
         std::getline(std::cin, input);
 
-        input = trim(input);
+        input = utils::trim(input);
 
         if (input.empty())
         {
             continue;
         }
 
-        std::string command = getCommand(input);
+        auto parsedCommand = command_parser::parseCommand(input);
 
-        std::string argument = input.substr(command.length());
-
-        if (!argument.empty() && (argument[0] == '\'' || argument[0] == '\"'))
-        {
-            argument = argument.substr(1);
-        }
-
-        if (!argument.empty() && (argument[0] == '\'' || argument[0] == '\"'))
-        {
-            argument = argument.substr(1);
-        }
-
-        if (!argument.empty() && argument[0] == ' ')
-        {
-            argument = argument.substr(1);
-        }
-
-        if (const auto it = builtins::registry.find(command); it != builtins::registry.end())
-        {
-            it->second(argument);
+        if (const auto it = builtins::registry.find(parsedCommand.command); it != builtins::registry.end()) {
+            const builtins::Result result = it->second(parsedCommand.argument);
+            if (result.message.empty())
+            {
+                continue;
+            }
+            std::ostream& out = *((result.statusCode == 0) ? parsedCommand.outStream : parsedCommand.errStream);
+            out << result.message << std::endl;
             continue;
         }
 
-        if (const std::optional<std::filesystem::path> result = environment::getCommandPath(command))
+        if (const std::optional<std::filesystem::path> result = environment::getCommandPath(parsedCommand.command))
         {
             if (const std::filesystem::path& command_path = *result; environment::isExecutable(command_path))
             {

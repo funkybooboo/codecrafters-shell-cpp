@@ -2,7 +2,9 @@
 
 #include <string>
 
+#include "../builtins.hpp"
+
 namespace builtins
 {
-    void pwd([[maybe_unused]] const std::string& argument);
+    Result pwd([[maybe_unused]] const std::string& argument);
 }

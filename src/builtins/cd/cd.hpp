@@ -2,7 +2,9 @@
 
 #include <string>
 
+#include "../builtins.hpp"
+
 namespace builtins
 {
-    void cd(const std::string& argument);
+    Result cd(const std::string& argument);
 }

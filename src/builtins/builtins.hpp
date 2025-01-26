@@ -1,12 +1,20 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <map>
 #include <functional>
 
 namespace builtins
 {
-  inline std::map<std::string, std::function<void(const std::string&)>> registry;
+    struct Result {
+        std::int8_t statusCode;
+        std::string message;
 
-  void loadRegistry();
+        Result(std::int8_t code, std::string   msg);
+    };
+
+    inline std::map<std::string, std::function<Result(const std::string&)>> registry;
+
+    void loadRegistry();
 }

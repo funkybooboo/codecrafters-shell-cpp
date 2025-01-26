@@ -1,17 +1,15 @@
-#include <iostream>
-
 #include "echo.hpp"
 
 namespace builtins
 {
-    void echo(const std::string& argument)
+    Result echo(const std::string& argument)
     {
         bool isInDoubleQuote = false;
         bool isInSingleQuote = false;
 
         std::string output;
 
-        int i = 0;
+        std::int32_t i = 0;
         while (i < argument.length())
         {
             const char c = argument[i];
@@ -77,6 +75,6 @@ namespace builtins
             i++;
         }
 
-        std::cout << output << std::endl;
+        return {0, output};
     }
 }

@@ -2,7 +2,9 @@
 
 #include <string>
 
+#include "../builtins.hpp"
+
 namespace builtins
 {
-    void exit(const std::string& argument);
+    Result exit(const std::string& argument);
 }

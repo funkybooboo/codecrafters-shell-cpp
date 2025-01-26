@@ -2,7 +2,9 @@
 
 #include <string>
 
+#include "../builtins.hpp"
+
 namespace builtins
 {
-    void echo(const std::string& argument);
+    Result echo(const std::string& argument);
 }
