@@ -23,4 +23,6 @@ add_executable(shell ${SOURCE_FILES}
         src/command_parser/command_parser.hpp
         src/utils/utils.hpp
         src/utils/utils.cpp
+        src/prompt_reader/prompt_reader.cpp
+        src/prompt_reader/prompt_reader.hpp
 )

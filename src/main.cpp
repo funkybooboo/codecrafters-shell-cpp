@@ -1,11 +1,12 @@
 #include <iostream>
+#include <string>
 #include <optional>
 #include <filesystem>
 
 #include "builtins/builtins.hpp"
 #include "environment/environment.hpp"
 #include "command_parser/command_parser.hpp"
-#include "utils/utils.hpp"
+#include "prompt_reader/prompt_reader.hpp"
 
 [[noreturn]] int main()
 {
@@ -16,12 +17,7 @@
 
     while (true)
     {
-        std::cout << "$ ";
-
-        std::string input;
-        std::getline(std::cin, input);
-
-        input = utils::trim(input);
+        std::string input = prompt_reader::getInput();
 
         if (input.empty())
         {
