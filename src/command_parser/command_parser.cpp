@@ -92,41 +92,53 @@ namespace command_parser
         std::int32_t i = 0;
         while (i < input.length())
         {
-            if (!isMySpace && isEqual(input, i, '1') && isEqual(input, i + 1, '>') && isEqual(input, i + 2, '>'))
-            {
-                isMySpace = true;
-                continue;
-            }
-
-            if (!isMySpace && isEqual(input, i, '1') && isEqual(input, i + 1, '>'))
-            {
-                isMySpace = true;
-                continue;
-            }
-
-            if (!isMySpace && isEqual(input, i, '>') && isEqual(input, i + 1, '>'))
-            {
-                isMySpace = true;
-                continue;
-            }
-
-            if (!isMySpace && isEqual(input, i, '>'))
-            {
-                isMySpace = true;
-                continue;
-            }
-
-            if (isMySpace && isEqual(input, i, '2') && isEqual(input, i + 1, '>') && isEqual(input, i + 2, '>'))
+            if (isEqual(input, i, '2') && isEqual(input, i + 1, '>') && isEqual(input, i + 2, '>'))
             {
                 isMySpace = false;
                 i += 3;
                 continue;
             }
 
-            if (isMySpace && isEqual(input, i, '2') && isEqual(input, i + 1, '>'))
+            if (isEqual(input, i, '2') && isEqual(input, i + 1, '>'))
             {
                 isMySpace = false;
                 i += 2;
+                continue;
+            }
+
+            if (isEqual(input, i, '1') && isEqual(input, i + 1, '>') && isEqual(input, i + 2, '>'))
+            {
+                isMySpace = true;
+                redirectFilePath += input[i];
+                redirectFilePath += input[i + 1];
+                redirectFilePath += input[i + 2];
+                i += 3;
+                continue;
+            }
+
+            if (isEqual(input, i, '1') && isEqual(input, i + 1, '>'))
+            {
+                isMySpace = true;
+                redirectFilePath += input[i];
+                redirectFilePath += input[i + 1];
+                i += 2;
+                continue;
+            }
+
+            if (isEqual(input, i, '>') && isEqual(input, i + 1, '>'))
+            {
+                isMySpace = true;
+                redirectFilePath += input[i];
+                redirectFilePath += input[i + 1];
+                i += 2;
+                continue;
+            }
+
+            if (isEqual(input, i, '>'))
+            {
+                isMySpace = true;
+                redirectFilePath += input[i];
+                i++;
                 continue;
             }
 
@@ -148,43 +160,50 @@ namespace command_parser
         std::int32_t i = 0;
         while (i < input.length())
         {
-            if (!isMySpace && isEqual(input, i, '2') && isEqual(input, i + 1, '>') && isEqual(input, i + 2, '>'))
-            {
-                isMySpace = true;
-                continue;
-            }
-
-            if (!isMySpace && isEqual(input, i, '2') && isEqual(input, i + 1, '>'))
-            {
-                isMySpace = true;
-                continue;
-            }
-
-            if (isMySpace && isEqual(input, i, '1') && isEqual(input, i + 1, '>') && isEqual(input, i + 2, '>'))
+            if (isEqual(input, i, '1') && isEqual(input, i + 1, '>') && isEqual(input, i + 2, '>'))
             {
                 isMySpace = false;
                 i += 3;
                 continue;
             }
 
-            if (isMySpace && isEqual(input, i, '1') && isEqual(input, i + 1, '>'))
+            if (isEqual(input, i, '1') && isEqual(input, i + 1, '>'))
             {
                 isMySpace = false;
                 i += 2;
                 continue;
             }
 
-            if (isMySpace && isEqual(input, i, '>') && isEqual(input, i + 1, '>'))
+            if (isEqual(input, i, '>') && isEqual(input, i + 1, '>'))
+            {
+                isMySpace = false;
+                i += 2;
+                continue;
+            }
+
+            if (isEqual(input, i, '>'))
             {
                 isMySpace = false;
                 i++;
                 continue;
             }
 
-            if (isMySpace && isEqual(input, i, '>'))
+            if (isEqual(input, i, '2') && isEqual(input, i + 1, '>') && isEqual(input, i + 2, '>'))
             {
-                isMySpace = false;
-                i++;
+                isMySpace = true;
+                redirectFilePath += input[i];
+                redirectFilePath += input[i + 1];
+                redirectFilePath += input[i + 2];
+                i += 3;
+                continue;
+            }
+
+            if (isEqual(input, i, '2') && isEqual(input, i + 1, '>'))
+            {
+                isMySpace = true;
+                redirectFilePath += input[i];
+                redirectFilePath += input[i + 1];
+                i += 2;
                 continue;
             }
 
