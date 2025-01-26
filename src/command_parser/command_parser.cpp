@@ -262,19 +262,14 @@ namespace command_parser
 
     std::ofstream* attemptFileOpen(const std::string& filePath, const std::ios_base::openmode openMode)
     {
-        if (const std::ifstream checkFile(filePath); !checkFile.good() || (openMode & std::ios::trunc))
-        {
-            const auto file = new std::ofstream();
-            file->open(filePath, openMode);
+        std::ofstream* file = nullptr;
 
-            if (file->is_open())
-            {
-                return file;
-            }
-            delete file;
-            return nullptr;
+        if ((openMode & std::ios::app) || (openMode & std::ios::out || !std::ifstream(filePath).good()))
+        {
+            file = new std::ofstream(filePath, openMode);
         }
-        return nullptr;
+
+        return file;
     }
 
     std::tuple<std::ostream*, std::ofstream*> getRedirectionStreamAndFile(std::ostream& defaultStream, const std::ios_base::openmode openMode, const std::string& redirectFilePath)
@@ -285,7 +280,10 @@ namespace command_parser
         if (!redirectFilePath.empty())
         {
             file = attemptFileOpen(redirectFilePath, openMode);
-            stream = file;
+            if (file)
+            {
+                stream = file;
+            }
         }
 
         return {stream, file};
@@ -371,7 +369,9 @@ namespace command_parser
         const std::string stderrRedirect = trimAndExtract(input, getStderrRedirect);
 
         auto [stdoutOpenMode, stdoutRedirectPath] = getStdoutOpenMode(stdoutRedirect);
+        stdoutRedirectPath = utils::trim(stdoutRedirectPath);
         auto [stderrOpenMode, stderrRedirectPath] = getStderrOpenMode(stderrRedirect);
+        stderrRedirectPath = utils::trim(stderrRedirectPath);
 
         auto [outStream, outFile] = getRedirectionStreamAndFile(std::cout, stdoutOpenMode, stdoutRedirectPath);
         auto [errStream, errFile] = getRedirectionStreamAndFile(std::cerr, stderrOpenMode, stderrRedirectPath);
