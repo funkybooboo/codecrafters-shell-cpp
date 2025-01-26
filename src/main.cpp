@@ -2,9 +2,22 @@
 #include <optional>
 #include <filesystem>
 
-#include "utils.hpp"
-#include "builtins.hpp"
-#include "environment.hpp"
+#include "builtins/builtins.hpp"
+#include "environment/environment.hpp"
+
+std::string getCommand(const std::string& input)
+{
+    std::string command;
+    for (const char c : input)
+    {
+        if (c == ' ')
+        {
+            break;
+        }
+        command += c;
+    }
+    return command;
+}
 
 [[noreturn]] int main()
 {
@@ -22,7 +35,7 @@
             continue;
         }
 
-        std::string command = utils::getToken(input);
+        std::string command = getCommand(input);
 
         std::string argument = input.substr(command.length());
 
