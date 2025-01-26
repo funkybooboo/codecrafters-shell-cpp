@@ -37,6 +37,13 @@ namespace builtins
                 continue;
             }
 
+            if (c == '\\')
+            {
+                output += argument[i + 1];
+                i += 2;
+                continue;
+            }
+
             if (c != ' ')
             {
                 output += c;
