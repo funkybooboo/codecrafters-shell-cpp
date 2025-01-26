@@ -266,10 +266,7 @@ namespace command_parser
         if (!redirectFilePath.empty())
         {
             file = attemptFileOpen(redirectFilePath, openMode);
-            if (file)
-            {
-                stream = file;
-            }
+            stream = file;
         }
 
         return {stream, file};
