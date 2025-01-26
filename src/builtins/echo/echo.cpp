@@ -23,6 +23,16 @@ namespace builtins
                 continue;
             }
 
+            if (c == '\\' && isInDoubleQuote)
+            {
+                if (argument[i + 1] == '\\' || argument[i + 1] == '$' || argument[i + 1] == '\"')
+                {
+                    output += argument[i + 1];
+                }
+                i += 2;
+                continue;
+            }
+
             if (isInDoubleQuote)
             {
                 output += c;
