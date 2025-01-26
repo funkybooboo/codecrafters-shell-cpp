@@ -18,13 +18,41 @@ std::string trim(const std::string& str) {
 
 std::string getCommand(const std::string& input)
 {
+    bool isInDoubleQuote = false;
+    bool isInSingleQuote = false;
+
     std::string command;
     for (const char c : input)
     {
+        if (c == '\"' && !isInSingleQuote)
+        {
+            isInDoubleQuote = !isInDoubleQuote;
+            continue;
+        }
+
+        if (isInDoubleQuote)
+        {
+            command += c;
+            continue;
+        }
+
+        if (c == '\'')
+        {
+            isInSingleQuote = !isInSingleQuote;
+            continue;
+        }
+
+        if (isInSingleQuote)
+        {
+            command += c;
+            continue;
+        }
+
         if (c == ' ')
         {
             break;
         }
+
         command += c;
     }
     return command;
@@ -51,6 +79,16 @@ std::string getCommand(const std::string& input)
         std::string command = getCommand(input);
 
         std::string argument = input.substr(command.length());
+
+        if (!argument.empty() && (argument[0] == '\'' || argument[0] == '\"'))
+        {
+            argument = argument.substr(1);
+        }
+
+        if (!argument.empty() && (argument[0] == '\'' || argument[0] == '\"'))
+        {
+            argument = argument.substr(1);
+        }
 
         if (!argument.empty() && argument[0] == ' ')
         {
