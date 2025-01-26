@@ -57,45 +57,73 @@ namespace command_parser
         return command;
     }
 
+    bool isEqual(const std::string &str, const std::int32_t i, const char what)
+    {
+        return i < str.length() - 1 && str[i] == what;
+    }
+
     std::string getArgument(const std::string& input)
     {
         std::string argument;
         std::int32_t i = 0;
         while (i < input.length()) {
-            const char c = input[i];
-            if ((c == '>') || (c == '1' && i + 1 < input.length() - 1 && input[i + 1] == '>') || (c == '2'  && i + 1 < input.length() - 1 && input[i + 1] == '>'))
+            if (
+                isEqual(input, i, '>') ||
+                (isEqual(input, i, '>') && isEqual(input, i + 1, '>')) ||
+                (isEqual(input, i, '1') && isEqual(input, i + 1, '>')) ||
+                (isEqual(input, i, '1') && isEqual(input, i + 1, '>') && isEqual(input, i + 2, '>')) ||
+                (isEqual(input, i, '2') && isEqual(input, i + 1, '>')) ||
+                (isEqual(input, i, '2') && isEqual(input, i + 1, '>') && isEqual(input, i + 2, '>'))
+                )
             {
                 break;
             }
-            argument += c;
+            argument += input[i];
             i++;
         }
         return argument;
     }
 
-    std::string getStdoutRedirectFilePath(const std::string& input)
+    std::string getStdoutRedirect(const std::string& input)
     {
         std::string redirectFilePath;
-        std::int32_t i = 0;
         bool isMySpace = false;
+
+        std::int32_t i = 0;
         while (i < input.length())
         {
-            const char c = input[i];
-            if (c == '1' && i + 1 < input.length() - 1 && input[i + 1] == '>')
+            if (!isMySpace && isEqual(input, i, '1') && isEqual(input, i + 1, '>') && isEqual(input, i + 2, '>'))
             {
                 isMySpace = true;
-                i += 2;
                 continue;
             }
 
-            if (c == '>')
+            if (!isMySpace && isEqual(input, i, '1') && isEqual(input, i + 1, '>'))
             {
                 isMySpace = true;
-                i++;
                 continue;
             }
 
-            if (c == '2' && i + 1 < input.length() - 1 && input[i + 1] == '>')
+            if (!isMySpace && isEqual(input, i, '>') && isEqual(input, i + 1, '>'))
+            {
+                isMySpace = true;
+                continue;
+            }
+
+            if (!isMySpace && isEqual(input, i, '>'))
+            {
+                isMySpace = true;
+                continue;
+            }
+
+            if (isMySpace && isEqual(input, i, '2') && isEqual(input, i + 1, '>') && isEqual(input, i + 2, '>'))
+            {
+                isMySpace = false;
+                i += 3;
+                continue;
+            }
+
+            if (isMySpace && isEqual(input, i, '2') && isEqual(input, i + 1, '>'))
             {
                 isMySpace = false;
                 i += 2;
@@ -104,7 +132,7 @@ namespace command_parser
 
             if (isMySpace)
             {
-                redirectFilePath += c;
+                redirectFilePath += input[i];
             }
 
             i++;
@@ -112,29 +140,48 @@ namespace command_parser
         return redirectFilePath;
     }
 
-    std::string getStderrRedirectFilePath(const std::string& input)
+    std::string getStderrRedirect(const std::string& input)
     {
         std::string redirectFilePath;
-        std::int32_t i = 0;
         bool isMySpace = false;
+
+        std::int32_t i = 0;
         while (i < input.length())
         {
-            const char c = input[i];
-            if (c == '2' && i + 1 < input.length() - 1 && input[i + 1] == '>')
+            if (!isMySpace && isEqual(input, i, '2') && isEqual(input, i + 1, '>') && isEqual(input, i + 2, '>'))
             {
                 isMySpace = true;
-                i += 2;
                 continue;
             }
 
-            if (c == '1' && i + 1 < input.length() - 1 && input[i + 1] == '>')
+            if (!isMySpace && isEqual(input, i, '2') && isEqual(input, i + 1, '>'))
+            {
+                isMySpace = true;
+                continue;
+            }
+
+            if (isMySpace && isEqual(input, i, '1') && isEqual(input, i + 1, '>') && isEqual(input, i + 2, '>'))
+            {
+                isMySpace = false;
+                i += 3;
+                continue;
+            }
+
+            if (isMySpace && isEqual(input, i, '1') && isEqual(input, i + 1, '>'))
             {
                 isMySpace = false;
                 i += 2;
                 continue;
             }
 
-            if (c == '>')
+            if (isMySpace && isEqual(input, i, '>') && isEqual(input, i + 1, '>'))
+            {
+                isMySpace = false;
+                i++;
+                continue;
+            }
+
+            if (isMySpace && isEqual(input, i, '>'))
             {
                 isMySpace = false;
                 i++;
@@ -143,7 +190,7 @@ namespace command_parser
 
             if (isMySpace)
             {
-                redirectFilePath += c;
+                redirectFilePath += input[i];
             }
 
             i++;
@@ -183,6 +230,10 @@ namespace command_parser
 
     std::string trimAndExtract(std::string& input, const std::function<std::string(const std::string&)>& getResult) {
         input = utils::trim(input);
+        if (input.empty())
+        {
+            return "";
+        }
         std::string result = getResult(input);
         input = input.substr(result.length());
         result = utils::trim(result);
@@ -190,7 +241,7 @@ namespace command_parser
         return result;
     }
 
-    std::tuple<std::ostream*, std::ofstream*> getRedirectionStreamAndFile(std::ostream& defaultStream, const std::string& redirectFilePath)
+    std::tuple<std::ostream*, std::ofstream*> getRedirectionStreamAndFile(std::ostream& defaultStream, const std::ios_base::openmode openMode, const std::string& redirectFilePath)
     {
         std::ostream* stream = &defaultStream;
         std::ofstream* file = nullptr;
@@ -198,7 +249,7 @@ namespace command_parser
         if (!redirectFilePath.empty())
         {
             file = new std::ofstream();
-            file->open(redirectFilePath, std::ios::out | std::ios::app);
+            file->open(redirectFilePath, openMode);
             if (!file->is_open())
             {
                 std::cerr << "Failed to open file for redirection" << std::endl;
@@ -212,15 +263,90 @@ namespace command_parser
         return {stream, file};
     }
 
+    std::tuple<std::ios_base::openmode, std::string> getStdoutOpenMode(const std::string &redirect)
+    {
+        std::ios_base::openmode openMode = std::ios::out | std::ios::app;
+        std::string redirectPath;
+
+        std::int32_t i = 0;
+        while (i < redirect.length())
+        {
+            if (isEqual(redirect, i, '>') && isEqual(redirect, i + 1, '>'))
+            {
+                openMode = std::ios::app;
+                i += 2;
+                continue;
+            }
+
+            if (isEqual(redirect, i, '>'))
+            {
+                openMode = std::ios::out;
+                i += 1;
+                continue;
+            }
+
+            if (isEqual(redirect, i, '1') && isEqual(redirect, i + 1, '>') && isEqual(redirect, i + 2, '>'))
+            {
+                openMode = std::ios::app;
+                i += 3;
+                continue;
+            }
+
+            if (isEqual(redirect, i, '1') && isEqual(redirect, i + 1, '>'))
+            {
+                openMode = std::ios::out;
+                i += 2;
+                continue;
+            }
+
+            redirectPath += redirect[i];;
+            i++;
+        }
+
+        return {openMode, redirectPath};
+    }
+
+    std::tuple<std::ios_base::openmode, std::string> getStderrOpenMode(const std::string &redirect)
+    {
+        std::ios_base::openmode openMode = std::ios::out | std::ios::app;
+        std::string redirectPath;
+
+        std::int32_t i = 0;
+        while (i < redirect.length())
+        {
+            if (isEqual(redirect, i, '2') && isEqual(redirect, i + 1, '>') && isEqual(redirect, i + 2, '>'))
+            {
+                openMode = std::ios::app;
+                i += 3;
+                continue;
+            }
+
+            if (isEqual(redirect, i, '2') && isEqual(redirect, i + 1, '>'))
+            {
+                openMode = std::ios::out;
+                i += 2;
+                continue;
+            }
+
+            redirectPath += redirect[i];
+            i++;
+        }
+
+        return {openMode, redirectPath};
+    }
+
     ParsedCommand parseCommand(std::string input)
     {
         const std::string command = trimAndExtract(input, getCommand);
         const std::string argument = trimAndExtract(input, getArgument);
-        const std::string stdoutRedirectFilePath = trimAndExtract(input, getStdoutRedirectFilePath);
-        const std::string stderrRedirectFilePath = trimAndExtract(input, getStderrRedirectFilePath);
+        const std::string stdoutRedirect = trimAndExtract(input, getStdoutRedirect);
+        const std::string stderrRedirect = trimAndExtract(input, getStderrRedirect);
 
-        auto [outStream, outFile] = getRedirectionStreamAndFile(std::cout, stdoutRedirectFilePath);
-        auto [errStream, errFile] = getRedirectionStreamAndFile(std::cerr, stderrRedirectFilePath);
+        auto [stdoutOpenMode, stdoutRedirectPath] = getStdoutOpenMode(stdoutRedirect);
+        auto [stderrOpenMode, stderrRedirectPath] = getStderrOpenMode(stderrRedirect);
+
+        auto [outStream, outFile] = getRedirectionStreamAndFile(std::cout, stdoutOpenMode, stdoutRedirectPath);
+        auto [errStream, errFile] = getRedirectionStreamAndFile(std::cerr, stderrOpenMode, stderrRedirectPath);
 
         return {command, argument, outStream, errStream, outFile, errFile};
     }
