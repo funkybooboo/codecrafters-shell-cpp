@@ -250,11 +250,7 @@ namespace command_parser
         {
             file = new std::ofstream();
             file->open(redirectFilePath, openMode);
-            if (!file->is_open())
-            {
-                std::cerr << "Failed to open file for redirection" << std::endl;
-            }
-            else
+            if (file->is_open())
             {
                 stream = file;
             }
