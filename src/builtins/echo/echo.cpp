@@ -6,13 +6,30 @@ namespace builtins
 {
     void echo(const std::string& argument)
     {
+        bool isInDoubleQuote = false;
         bool isInSingleQuote = false;
+
         std::string output;
 
         int i = 0;
         while (i < argument.length())
         {
             const char c = argument[i];
+
+            if (c == '\"')
+            {
+                isInDoubleQuote = !isInDoubleQuote;
+                i++;
+                continue;
+            }
+
+            if (isInDoubleQuote)
+            {
+                output += c;
+                i++;
+                continue;
+            }
+
             if (c == '\'')
             {
                 isInSingleQuote = !isInSingleQuote;
