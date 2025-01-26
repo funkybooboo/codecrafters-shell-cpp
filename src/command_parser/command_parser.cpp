@@ -241,6 +241,23 @@ namespace command_parser
         return result;
     }
 
+    std::ofstream* attemptFileOpen(const std::string& filePath, const std::ios_base::openmode openMode)
+    {
+        if (const std::ifstream checkFile(filePath); !checkFile.good() || (openMode & std::ios::trunc))
+        {
+            const auto file = new std::ofstream();
+            file->open(filePath, openMode);
+
+            if (file->is_open())
+            {
+                return file;
+            }
+            delete file;
+            return nullptr;
+        }
+        return nullptr;
+    }
+
     std::tuple<std::ostream*, std::ofstream*> getRedirectionStreamAndFile(std::ostream& defaultStream, const std::ios_base::openmode openMode, const std::string& redirectFilePath)
     {
         std::ostream* stream = &defaultStream;
@@ -248,9 +265,8 @@ namespace command_parser
 
         if (!redirectFilePath.empty())
         {
-            file = new std::ofstream();
-            file->open(redirectFilePath, openMode);
-            if (file->is_open())
+            file = attemptFileOpen(redirectFilePath, openMode);
+            if (file)
             {
                 stream = file;
             }
