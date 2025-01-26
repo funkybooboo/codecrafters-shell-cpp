@@ -67,7 +67,7 @@ namespace prompt_reader
         {
             input.replace(0, commandPart.length(), match);
             cursorPos = match.length();
-            std::cout << "\r$ " << input;
+            std::cout << "\r$ " << input + " ";
         }
     }
 
