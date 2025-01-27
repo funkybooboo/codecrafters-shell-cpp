@@ -12,4 +12,18 @@ namespace utils
 
         return str.substr(start, end - start + 1);
     }
+
+    void sort(std::vector<std::string>& words) {
+        const int n = words.size();
+
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (words[j] > words[j + 1]) {
+                    const std::string temp = words[j];
+                    words[j] = words[j + 1];
+                    words[j + 1] = temp;
+                }
+            }
+        }
+    }
 }

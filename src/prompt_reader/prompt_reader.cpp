@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <algorithm>
 
 #include "../utils/utils.hpp"
 #include "../builtins/builtins.hpp"
@@ -107,9 +106,9 @@ namespace prompt_reader
                     commandPart = input;
                 }
 
-                const std::vector<std::string> matches = getMatches(commandPart);
+                std::vector<std::string> matches = getMatches(commandPart);
 
-                std::sort(matches.begin(), matches.end(), compareDescending);
+                utils::sort(matches);
 
                 if (matches.empty())
                 {
