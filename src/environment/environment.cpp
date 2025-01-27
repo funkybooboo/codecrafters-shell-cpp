@@ -29,10 +29,30 @@ namespace environment
         return paths;
     }
 
+    std::vector<std::string> getCommands()
+    {
+        std::vector<std::string> commands;
+
+        for (const auto& directory : getPaths())
+        {
+            if (std::filesystem::is_directory(directory))
+            {
+                for (const auto& entry : std::filesystem::directory_iterator(directory))
+                {
+                    if (is_regular_file(entry) && isExecutable(entry.path()))
+                    {
+                        commands.push_back(entry.path().filename().string());
+                    }
+                }
+            }
+        }
+        return commands;
+    }
+
     std::optional<std::filesystem::path> getCommandPath(const std::string& command)
     {
 
-        for (std::vector<std::string> paths = getPaths();const auto& directory : paths)
+        for (std::vector<std::string> paths = getPaths(); const auto& directory : paths)
         {
 
             if (std::filesystem::path command_path = std::filesystem::path(directory) / command; exists(command_path) && is_regular_file(command_path))

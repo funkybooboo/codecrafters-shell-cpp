@@ -5,6 +5,7 @@
 
 #include "../utils/utils.hpp"
 #include "../builtins/builtins.hpp"
+#include "../environment/environment.hpp"
 #include "prompt_reader.hpp"
 
 namespace prompt_reader
@@ -15,6 +16,23 @@ namespace prompt_reader
         constexpr char TAB = '\t';
         constexpr char BACKSPACE = '\b';
         constexpr char DELETE = 127;
+    }
+
+    inline std::map<std::string, std::string> completions;
+
+    void loadCompletions()
+    {
+        std::vector<std::string> commands = environment::getCommands();
+        commands.insert(commands.end(), builtins::builtinNames.begin(), builtins::builtinNames.end());
+        for (const std::string& command : commands)
+        {
+            std::string key;
+            for (const char c : command)
+            {
+                key += c;
+                completions[key] = command;
+            }
+        }
     }
 
     char getChar()
@@ -37,18 +55,13 @@ namespace prompt_reader
         return static_cast<char>(c);
     }
 
-    std::string findClosestMatch(const std::string& input, const std::vector<std::string>& builtinNames) {
-        std::string closestMatch;
-
-        for (const std::string& builtinName : builtinNames) {
-            if (builtinName.find(input) == 0) {
-                return builtinName;
-            }
+    std::string findCompletedCommand(const std::string& commandPart) {
+        if (const auto it = completions.find(commandPart); it != completions.end())
+        {
+            return it->second;
         }
-
         std::cout << "\a";
-        
-        return input;
+        return commandPart;
     }
 
     void handleTabCompletion(std::string& input, size_t& cursorPos)
@@ -65,7 +78,7 @@ namespace prompt_reader
             commandPart = input;
         }
 
-        if (std::string match = findClosestMatch(commandPart, builtins::builtinNames); match != commandPart)
+        if (std::string match = findCompletedCommand(commandPart); match != commandPart)
         {
             match += " ";
             input.replace(0, commandPart.length(), match);

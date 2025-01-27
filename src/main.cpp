@@ -14,6 +14,7 @@
     std::cerr << std::unitbuf;
 
     builtins::loadRegistry();
+    prompt_reader::loadCompletions();
 
     while (true)
     {
