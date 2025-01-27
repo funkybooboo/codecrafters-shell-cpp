@@ -104,6 +104,9 @@ namespace prompt_reader
                 }
 
                 const std::vector<std::string> matches = getMatches(commandPart);
+
+                std::sort(matches.begin(), matches.end());
+
                 if (matches.empty())
                 {
                     std::cout << "\a";
