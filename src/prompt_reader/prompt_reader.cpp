@@ -46,11 +46,11 @@ namespace prompt_reader
             std::vector commands(it->second.begin(), it->second.end());
             if (commands.empty())
             {
-                return {commandPart};
+                return {};
             }
             return commands;
         }
-        return {commandPart};
+        return {};
     }
 
     char getChar()
@@ -107,13 +107,16 @@ namespace prompt_reader
 
                 utils::sort(matches);
 
-                if (tabCount == 1)
+                if (matches.empty())
                 {
-                    if (matches.empty() || matches.size() > 1)
+                    if (tabCount == 1)
                     {
                         std::cout << "\a";
                     }
-                    else
+                }
+                else if (matches.size() == 1)
+                {
+                    if (tabCount == 1)
                     {
                         std::string match = matches[0];
                         match += " ";
@@ -122,17 +125,24 @@ namespace prompt_reader
                         std::cout << "\r$ " << input;
                     }
                 }
-                else if (tabCount == 2)
+                else
                 {
-                    std::string matchList;
-                    for (const std::string& match : matches)
+                    if (tabCount == 1)
                     {
-                        matchList += match + "  ";
+                        std::cout << "\a";
                     }
-                    matchList.pop_back();
-                    std::cout << std::endl << matchList << std::endl;
-                    std::cout << "$ ";
-                    std::cout << input;
+                    else if (tabCount == 2)
+                    {
+                        std::string matchList;
+                        for (const std::string& match : matches)
+                        {
+                            matchList += match + "  ";
+                        }
+                        matchList.pop_back();
+                        std::cout << std::endl << matchList << std::endl;
+                        std::cout << "$ ";
+                        std::cout << input;
+                    }
                 }
             }
             else
