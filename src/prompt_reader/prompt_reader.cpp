@@ -46,6 +46,8 @@ namespace prompt_reader
             }
         }
 
+        std::cout << "\a";
+        
         return input;
     }
 
