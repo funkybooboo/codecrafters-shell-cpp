@@ -106,15 +106,20 @@ namespace prompt_reader
 
                 utils::sort(matches);
 
-                if (matches.empty())
-                {
-                    std::cout << "\a";
-                    continue;
-                }
-
                 if (tabCount == 1)
                 {
-                    std::cout << "\a";
+                    if (matches.empty() || matches.size() > 1)
+                    {
+                        std::cout << "\a";
+                    }
+                    else
+                    {
+                        std::string match = matches[0];
+                        match += " ";
+                        input.replace(0, commandPart.length(), match);
+                        cursorPos = match.length();
+                        std::cout << "\r$ " << input;
+                    }
                 }
                 else if (tabCount == 2)
                 {
