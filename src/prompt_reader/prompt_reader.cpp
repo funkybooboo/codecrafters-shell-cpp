@@ -123,15 +123,23 @@ namespace prompt_reader
                 }
                 else if (tabCount == 2)
                 {
-                    std::string matchList;
-                    for (const std::string& match : matches)
+                    if (matches.empty())
                     {
-                        matchList += match + "  ";
+                        std::cout << "\a";
+
                     }
-                    matchList.pop_back();
-                    std::cout << std::endl << matchList << std::endl;
-                    std::cout << "$ ";
-                    std::cout << input;
+                    else
+                    {
+                        std::string matchList;
+                        for (const std::string& match : matches)
+                        {
+                            matchList += match + "  ";
+                        }
+                        matchList.pop_back();
+                        std::cout << std::endl << matchList << std::endl;
+                        std::cout << "$ ";
+                        std::cout << input;
+                    }
                 }
             }
             else
