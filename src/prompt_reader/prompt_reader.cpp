@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 
 #include "../utils/utils.hpp"
 #include "../builtins/builtins.hpp"
@@ -20,7 +21,7 @@ namespace prompt_reader
         constexpr char DELETE = 127;
     }
 
-    inline std::map<std::string, std::vector<std::string>> completions;
+    inline std::map<std::string, std::set<std::string>> completions;
 
     void loadCompletions()
     {
@@ -33,9 +34,23 @@ namespace prompt_reader
             for (const char c : command)
             {
                 key += c;
-                completions[key].push_back(command);
+                completions[key].insert(command);
             }
         }
+    }
+
+    std::vector<std::string> getMatches(const std::string& commandPart)
+    {
+        if (const auto it = completions.find(commandPart); it != completions.end())
+        {
+            std::vector commands(it->second.begin(), it->second.end());
+            if (commands.empty())
+            {
+                return {commandPart};
+            }
+            return commands;
+        }
+        return {commandPart};
     }
 
     char getChar()
@@ -56,20 +71,6 @@ namespace prompt_reader
         }
 
         return static_cast<char>(c);
-    }
-
-    std::vector<std::string> getMatches(const std::string& commandPart)
-    {
-        if (const auto it = completions.find(commandPart); it != completions.end())
-        {
-            std::vector<std::string> commands = it->second;
-            if (commands.empty())
-            {
-                return {commandPart};
-            }
-            return commands;
-        }
-        return {commandPart};
     }
 
     std::string getInput()
