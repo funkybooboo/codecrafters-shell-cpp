@@ -73,6 +73,10 @@ namespace prompt_reader
         return {commandPart};
     }
 
+    bool compareDescending(const std::string& a, const std::string& b) {
+        return a > b;
+    }
+
     std::string getInput()
     {
         std::cout << "$ ";
@@ -105,7 +109,7 @@ namespace prompt_reader
 
                 const std::vector<std::string> matches = getMatches(commandPart);
 
-                std::sort(matches.begin(), matches.end());
+                std::sort(matches.begin(), matches.end(), compareDescending);
 
                 if (matches.empty())
                 {
