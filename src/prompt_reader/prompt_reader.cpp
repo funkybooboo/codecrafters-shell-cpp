@@ -53,6 +53,25 @@ namespace prompt_reader
         return {};
     }
 
+    std::string getLongestCommonPrefix(const std::vector<std::string>& matches)
+    {
+        if (matches.empty())
+            return "";
+
+        std::string prefix = matches[0];
+        for (const std::string& match : matches)
+        {
+            size_t i = 0;
+            while (i < prefix.length() && i < match.length() && prefix[i] == match[i])
+            {
+                i++;
+            }
+            prefix = prefix.substr(0, i);
+        }
+
+        return prefix;
+    }
+
     char getChar()
     {
         termios oldt{}, newt{};
@@ -73,7 +92,7 @@ namespace prompt_reader
         return static_cast<char>(c);
     }
 
-    std::string getInput()
+     std::string getInput()
     {
         std::cout << "$ ";
 
@@ -129,7 +148,16 @@ namespace prompt_reader
                 {
                     if (tabCount == 1)
                     {
-                        std::cout << "\a";
+                        if (std::string longestPrefix = getLongestCommonPrefix(matches); longestPrefix.length() > commandPart.length())
+                        {
+                            input.replace(0, commandPart.length(), longestPrefix);
+                            cursorPos = longestPrefix.length();
+                            std::cout << "\r$ " << input;
+                        }
+                        else
+                        {
+                            std::cout << "\a";
+                        }
                     }
                     else if (tabCount == 2)
                     {
