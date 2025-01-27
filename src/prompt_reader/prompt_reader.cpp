@@ -2,6 +2,9 @@
 #include <termios.h>
 #include <iostream>
 #include <string>
+#include <vector>
+#include <map>
+#include <algorithm>
 
 #include "../utils/utils.hpp"
 #include "../builtins/builtins.hpp"
@@ -18,19 +21,20 @@ namespace prompt_reader
         constexpr char DELETE = 127;
     }
 
-    inline std::map<std::string, std::string> completions;
+    inline std::map<std::string, std::vector<std::string>> completions;
 
     void loadCompletions()
     {
         std::vector<std::string> commands = environment::getCommands();
         commands.insert(commands.end(), builtins::builtinNames.begin(), builtins::builtinNames.end());
+
         for (const std::string& command : commands)
         {
             std::string key;
             for (const char c : command)
             {
                 key += c;
-                completions[key] = command;
+                completions[key].push_back(command);
             }
         }
     }
@@ -55,36 +59,18 @@ namespace prompt_reader
         return static_cast<char>(c);
     }
 
-    std::string findCompletedCommand(const std::string& commandPart) {
+    std::vector<std::string> getMatches(const std::string& commandPart)
+    {
         if (const auto it = completions.find(commandPart); it != completions.end())
         {
-            return it->second;
+            std::vector<std::string> commands = it->second;
+            if (commands.empty())
+            {
+                return {commandPart};
+            }
+            return commands;
         }
-        std::cout << "\a";
-        return commandPart;
-    }
-
-    void handleTabCompletion(std::string& input, size_t& cursorPos)
-    {
-        const size_t commandEndPos = input.find_first_of(' ');
-
-        std::string commandPart;
-        if (commandEndPos != std::string::npos)
-        {
-            commandPart = input.substr(0, commandEndPos);
-        }
-        else
-        {
-            commandPart = input;
-        }
-
-        if (std::string match = findCompletedCommand(commandPart); match != commandPart)
-        {
-            match += " ";
-            input.replace(0, commandPart.length(), match);
-            cursorPos = match.length();
-            std::cout << "\r$ " << input;
-        }
+        return {commandPart};
     }
 
     std::string getInput()
@@ -93,6 +79,7 @@ namespace prompt_reader
 
         std::string input;
         size_t cursorPos = 0;
+        std::int8_t tabCount = 0;
 
         while (true)
         {
@@ -103,10 +90,46 @@ namespace prompt_reader
             }
             else if (c == prompt_constants::TAB)
             {
-                handleTabCompletion(input, cursorPos);
+                tabCount++;
+                const size_t commandEndPos = input.find_first_of(' ');
+
+                std::string commandPart;
+                if (commandEndPos != std::string::npos)
+                {
+                    commandPart = input.substr(0, commandEndPos);
+                }
+                else
+                {
+                    commandPart = input;
+                }
+
+                const std::vector<std::string> matches = getMatches(commandPart);
+                if (matches.empty())
+                {
+                    std::cout << "\a";
+                    continue;
+                }
+
+                if (tabCount == 1)
+                {
+                    std::cout << "\a";
+                }
+                else if (tabCount == 2)
+                {
+                    std::string matchList;
+                    for (const std::string& match : matches)
+                    {
+                        matchList += match + "  ";
+                    }
+                    matchList.pop_back();
+                    std::cout << std::endl << matchList << std::endl;
+                    std::cout << "$ ";
+                    std::cout << input;
+                }
             }
             else
             {
+                tabCount = 0;
                 input.insert(cursorPos, 1, c);
                 cursorPos++;
                 std::cout << c;
