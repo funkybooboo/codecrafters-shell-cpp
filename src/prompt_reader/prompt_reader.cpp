@@ -72,10 +72,6 @@ namespace prompt_reader
         return {commandPart};
     }
 
-    bool compareDescending(const std::string& a, const std::string& b) {
-        return a > b;
-    }
-
     std::string getInput()
     {
         std::cout << "$ ";
