@@ -13,17 +13,30 @@ namespace utils
         return str.substr(start, end - start + 1);
     }
 
-    void sort(std::vector<std::string>& words) {
-        const int n = words.size();
+    int partition(std::vector<std::string>& words, const int low, const int high) {
+        const std::string pivot = words[high];
+        int i = low - 1;
 
-        for (int i = 0; i < n - 1; i++) {
-            for (int j = 0; j < n - i - 1; j++) {
-                if (words[j] > words[j + 1]) {
-                    const std::string temp = words[j];
-                    words[j] = words[j + 1];
-                    words[j + 1] = temp;
-                }
+        for (int j = low; j < high; j++) {
+            if (words[j] < pivot) {
+                i++;
+                std::swap(words[i], words[j]);
             }
         }
+
+        std::swap(words[i + 1], words[high]);
+        return i + 1;
+    }
+
+    void quicksort(std::vector<std::string>& words, const int low, const int high) {
+        if (low < high) {
+            const int pi = partition(words, low, high);
+            quicksort(words, low, pi - 1);
+            quicksort(words, pi + 1, high);
+        }
+    }
+
+    void sort(std::vector<std::string>& words) {
+        quicksort(words, 0, words.size() - 1);
     }
 }
