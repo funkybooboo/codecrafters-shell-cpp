@@ -32,3 +32,7 @@ Note: This section is for stages 2 and beyond.
    `src/main.cpp`.
 1. Commit your changes and run `git push origin master` to submit your solution
    to CodeCrafters. Test output will be streamed to your terminal.
+
+## License
+
+This project is licensed under the GNU General Public License v3.0. See the LICENSE file for details.
